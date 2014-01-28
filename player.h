@@ -16,10 +16,13 @@
 extern struct player p[2];
 extern int numPlayers;
 
+void initPlayer(int,int,int,int,int,int,int,int,int);
 void moveLeft(int);
 void moveRight(int);
 void turretCW(int);
 void turretCCW(int);
 void turretFire(int,int);
+int getTurretWidth(int);
+int getTurretHeight(int);
 
 #endif

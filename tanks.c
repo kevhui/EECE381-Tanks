@@ -6,7 +6,6 @@
  *		Author: Brittaney Geisler, Isaac Cheng, Kelvin Au, Kevin Hui
  */
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -14,72 +13,73 @@
 #include "screen.h"
 #include "values.h"
 #include "player.h"
+#include "field.h"
 
 struct player p[2];
+char field[SCREEN_HEIGHT][SCREEN_WIDTH];
 int turn = pOne;
 int numPlayers = 2;
 
 int main(void) {
+	int i, j;
 
+	//TODO: player has to check where he spawns
+	//TODO: field generating algorithm
 	initScreen();
-	int i;
+	initField();
 
-	p[0].x = 50;
-	p[0].y = 159;
-	p[0].deg = 0;
-	p[0].hp = 1;
-	p[0].colour = 0xAAAA;
+	//note HAVE to init field then players
+	initPlayer(pOne, 50, SCREEN_HEIGHT * 7 / 10 - TANK_HEIGHT - 1, 0, 1,
+			0xAAAA, 0, 1, 100);
+	initPlayer(pTwo, 250, SCREEN_HEIGHT * 7 / 10 - TANK_HEIGHT - 1, 0, 1,
+			0xCCCC, 0, 1, 100);
 
-	p[1].x = 250;
-	p[1].y = 159;
-	p[0].deg = 0;
-	p[1].hp = 1;
-	p[1].colour = 0xCCCC;
+	//printField();
 
-	initScreen();
-	while(1){
+	while (1) {
 		//printSD();
 
 		//moves left
-		if(*keys == 8){
+		if (*keys == 8) {
 			moveLeft(turn);
 		}
 		//moves right
-		if(*keys == 4){
+		if (*keys == 4) {
 			moveRight(turn);
 		}
 		//turret fire
-		if(*keys == 2){
-			turretFire(turn,50); //need to get power from keyboard
-			turn = (turn+1)%2;
+		if (*keys == 2) {
+			turretFire(turn, 300); //need to get power from keyboard
+
+			//TODO: skip players that are dead
+			turn = (turn + 1) % numPlayers;
+
 		}
 		//turret CW
-		if(*switches == 1){
+		if (*switches == 1) {
 			turretCW(turn);
 		}
 		//turret CCW
-		if(*switches == 2){
+		if (*switches == 2) {
 			turretCCW(turn);
 		}
 
-
-		printf("degree: %d",p[turn].deg);
+		//printf("degree: %d \n",p[turn].deg);
 
 		clearScreen();
-		updateField();
 
 		for (i = 0; i < numPlayers; ++i) {
-			updatePlayer(p[i].x,p[i].y,p[i].deg,p[i].colour);
+			updatePlayer(p[i].x, p[i].y, p[i].deg, p[i].colour);
 		}
-		updateScreen();
 
-		printf("\n");
+		updateField();
+		updateScreen();
 	}
 	/*
-	printLines();
-	printString();
-	//printLines();
-	*/
+	 printLines();
+	 printString();
+	 //printLines();
+	 */
 
 	return 0;
 }

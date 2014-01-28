@@ -3,8 +3,8 @@
 
 #include <system.h>
 
-#define GRAVITY -50
-#define PIXEL_SCALE 100
+#define GRAVITY -200
+#define PIXEL_SCALE 1000
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
 #define keys (volatile char *) PARALLEL_PORT_BASE
@@ -18,6 +18,8 @@
 #define pThree 2
 #define pFour 3
 #define pFive 5
+#define NOTHING 9
+#define GROUND 8
 
 struct player{
 	int x;
@@ -25,6 +27,9 @@ struct player{
 	int deg;
 	int hp;
 	int colour;
+	int points;
+	int alive;
+	int gas;
 };
 
 struct bullet{

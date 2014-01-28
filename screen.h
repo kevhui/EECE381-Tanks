@@ -17,6 +17,7 @@
 #include <math.h>
 #include "values.h"
 #include "player.h"
+#include "field.h"
 
 void initScreen(void);
 void clearScreen(void);

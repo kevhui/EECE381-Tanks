@@ -146,6 +146,7 @@ C_SRCS += tanks.c
 C_SRCS += sd_card.c
 C_SRCS += screen.c
 C_SRCS += player.c
+C_SRCS += field.c
 CXX_SRCS :=
 ASM_SRCS :=
 

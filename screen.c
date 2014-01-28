@@ -10,6 +10,7 @@
 alt_up_pixel_buffer_dma_dev *pixel_buffer;
 int i = 0;
 
+//initialises the screen buffer
 void initScreen() {
 	unsigned int pixel_buffer_addr1 = PIXEL_BUFFER_BASE;
 	unsigned int pixel_buffer_addr2 = PIXEL_BUFFER_BASE + PIXEL_BUFFER_SPAN / 2;// Set the 1st buffer address
@@ -29,10 +30,12 @@ void initScreen() {
 	alt_up_pixel_buffer_dma_clear_screen(pixel_buffer, 1);
 }
 
+//clears the screen
 void clearScreen() {
 	alt_up_pixel_buffer_dma_clear_screen(pixel_buffer, 1);
 }
 
+//swaps the background buffer to the foreground
 void updateScreen() {
 	alt_up_pixel_buffer_dma_swap_buffers(pixel_buffer);
 	while (alt_up_pixel_buffer_dma_check_swap_buffers_status(pixel_buffer))
@@ -40,26 +43,41 @@ void updateScreen() {
 	//printf("is it white?"); 	for (count = 0; count < wait; ++count) {	}
 }
 
+//TODO: Print the whole field without lag
+//prints the field to the screen
 void updateField() {
 	// Draw a rectangle for the field
-	alt_up_pixel_buffer_dma_draw_rectangle(pixel_buffer, 0, 160, SCREEN_WIDTH
-			- 1, SCREEN_HEIGHT - 1, 0xFFFF, 1);
+	//alt_up_pixel_buffer_dma_draw_rectangle(pixel_buffer, 0, 160, SCREEN_WIDTH
+	//	- 1, SCREEN_HEIGHT - 1, 0xFFFF, 1);
+	int i;
+	int j;// = SCREEN_HEIGHT*7/10+1; //TEMPORARY ONLY PRINT ONE LINE OF FIELD
+	for (j = SCREEN_HEIGHT * 7 / 10; j < SCREEN_HEIGHT * 7 / 10 + 2; j++) {
+		for (i = 0; i < SCREEN_WIDTH; i++) {
+			if (field[j][i] == GROUND)
+				alt_up_pixel_buffer_dma_draw(pixel_buffer, 0xFFFF, i, j);
+		}
+	}
+
 }
 
+//prints the prints a player to the screen
 void updatePlayer(int x, int y, int deg, int colour) {
 	// Draw a rectangle for the field
 	alt_up_pixel_buffer_dma_draw_rectangle(pixel_buffer, x, y, x + TANK_LENGTH,
-			y - TANK_HEIGHT, colour, 1);
-	alt_up_pixel_buffer_dma_draw_line(pixel_buffer, x + TANK_LENGTH/2, y
-			- TANK_HEIGHT, x + TANK_LENGTH/2 + TURRET_LENGTH * sin((deg * M_PI)
-			/ 180), y - TANK_HEIGHT - TURRET_LENGTH * cos((deg * M_PI) / 180),
-			colour, 1);
+			y + TANK_HEIGHT, colour, 1);
+	alt_up_pixel_buffer_dma_draw_line(pixel_buffer, x + TANK_LENGTH/2, y,
+			x + TANK_LENGTH / 2 + getTurretWidth(deg),
+			y - getTurretHeight(deg), colour,
+			1);
 }
 
-void updateBullet(int x, int y){
-	alt_up_pixel_buffer_dma_draw(pixel_buffer,0xFFFF,x,y);
+//prints a bullet to the screen
+//TODO: make the bullet not one pixel
+void updateBullet(int x, int y) {
+	alt_up_pixel_buffer_dma_draw(pixel_buffer, 0xFFFF, x, y);
 }
 
+//prints lines
 void printLines() {
 	alt_up_pixel_buffer_dma_dev* pixel_buffer;
 	// Use the name of your pixel buffer DMA core
@@ -80,6 +98,7 @@ void printLines() {
 	alt_up_pixel_buffer_dma_draw_line(pixel_buffer, 0, 0, 320, 240, 0xFFFF, 0);
 }
 
+//Prints string
 void printString() {
 	// Initialize
 	alt_up_char_buffer_dev *char_buffer;
