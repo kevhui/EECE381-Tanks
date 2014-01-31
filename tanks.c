@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <io.h>
 #include "sd_card.h"
 #include "screen.h"
 #include "values.h"
@@ -16,51 +17,51 @@
 #include "field.h"
 
 struct player p[2];
-char field[SCREEN_HEIGHT][SCREEN_WIDTH];
+int field [SCREEN_WIDTH] ;
 int turn = pOne;
 int numPlayers = 2;
 
 int main(void) {
-	int i, j;
-
+	int i;
 	//TODO: player has to check where he spawns
 	//TODO: field generating algorithm
 	initScreen();
+	initCharBuffer();
 	initField();
 
 	//note HAVE to init field then players
-	initPlayer(pOne, 50, SCREEN_HEIGHT * 7 / 10 - TANK_HEIGHT - 1, 0, 1,
+	initPlayer(pOne, 50, SCREEN_HEIGHT * 7 / 10 - TANK_HEIGHT - 1, 90, 3,
 			0xAAAA, 0, 1, 100);
-	initPlayer(pTwo, 250, SCREEN_HEIGHT * 7 / 10 - TANK_HEIGHT - 1, 0, 1,
+	initPlayer(pTwo, 100, SCREEN_HEIGHT * 7 / 10 - TANK_HEIGHT - 1, -90, 3,
 			0xCCCC, 0, 1, 100);
 
 	//printField();
 
 	while (1) {
 		//printSD();
-
 		//moves left
-		if (*keys == 8) {
+		if (IORD(keys,0) == 8) {
 			moveLeft(turn);
 		}
 		//moves right
-		if (*keys == 4) {
+		if (IORD(keys,0) == 4) {
 			moveRight(turn);
 		}
 		//turret fire
-		if (*keys == 2) {
-			turretFire(turn, 300); //need to get power from keyboard
+		if (IORD(keys,0) == 2) {
+			//fire power should be 0<power<100
+			turretFire(turn, 100); //need to get power from keyboard
 
 			//TODO: skip players that are dead
 			turn = (turn + 1) % numPlayers;
 
 		}
 		//turret CW
-		if (*switches == 1) {
+		if (IORD(switches,0) == 1) {
 			turretCW(turn);
 		}
 		//turret CCW
-		if (*switches == 2) {
+		if (IORD(switches,0) == 2) {
 			turretCCW(turn);
 		}
 
@@ -69,7 +70,9 @@ int main(void) {
 		clearScreen();
 
 		for (i = 0; i < numPlayers; ++i) {
-			updatePlayer(p[i].x, p[i].y, p[i].deg, p[i].colour);
+			checkPlayerFalling(i);
+			updatePlayer(i);
+			printHp(i);
 		}
 
 		updateField();

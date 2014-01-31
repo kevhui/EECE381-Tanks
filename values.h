@@ -3,16 +3,16 @@
 
 #include <system.h>
 
-#define GRAVITY -200
-#define PIXEL_SCALE 1000
+#define GRAVITY -15
+#define PIXEL_SCALE 500
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
 #define keys (volatile char *) PARALLEL_PORT_BASE
 #define switches (volatile char *) SWITCHES_BASE
 #define VERBOSE 0
-#define TANK_LENGTH 12
-#define TANK_HEIGHT 8
-#define TURRET_LENGTH 13
+#define TANK_LENGTH 9
+#define TANK_HEIGHT 6
+#define TURRET_LENGTH 10
 #define pOne 0
 #define pTwo 1
 #define pThree 2

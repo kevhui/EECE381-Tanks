@@ -12,7 +12,7 @@
 #include "values.h"
 #include <math.h>
 
-extern char field[SCREEN_HEIGHT][SCREEN_WIDTH];
+extern int field[SCREEN_WIDTH];
 
 void initField(void);
 void generateField(void);

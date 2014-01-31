@@ -20,12 +20,15 @@
 #include "field.h"
 
 void initScreen(void);
+void initCharBuffer(void);
 void clearScreen(void);
 void updateScreen(void);
 void updateField(void);
-void updatePlayer(int,int,int,int);
+void updatePlayer(int);
 void updateBullet(int,int);
+void updateExplosion(int,int,int,int);
 void printLines(void);
 void printString(void);
+void printHp(int);
 
 #endif
