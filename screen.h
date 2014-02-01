@@ -1,5 +1,5 @@
 /*
- * vga.h
+ * screen.h
  *
  *	Created: 2014-01-18
  *		Author: Brittaney Geisler, Isaac Cheng, Kelvin Au, Kevin Hui
@@ -18,6 +18,7 @@
 #include "values.h"
 #include "player.h"
 #include "field.h"
+#include "images.h"
 
 void initScreen(void);
 void initCharBuffer(void);
@@ -30,5 +31,6 @@ void updateExplosion(int,int,int,int);
 void printLines(void);
 void printString(void);
 void printHp(int);
+void drawTest(void);
 
 #endif

@@ -10,8 +10,8 @@
 #define keys (volatile char *) PARALLEL_PORT_BASE
 #define switches (volatile char *) SWITCHES_BASE
 #define VERBOSE 0
-#define TANK_LENGTH 9
-#define TANK_HEIGHT 6
+#define TANK_LENGTH 24
+#define TANK_HEIGHT 19
 #define TURRET_LENGTH 10
 #define pOne 0
 #define pTwo 1

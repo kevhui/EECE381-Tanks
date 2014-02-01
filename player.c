@@ -39,7 +39,7 @@ void moveLeft(int pNumber) {
 
 //moves the specified player one unit right if possible
 void moveRight(int pNumber) {
-	int new_x = p[pNumber].x + TANK_LENGTH + 1;
+	int new_x = p[pNumber].x + TANK_LENGTH;
 	if ( new_x < SCREEN_WIDTH && field[new_x] > p[pNumber].y + TANK_HEIGHT ){
 		p[pNumber].x += 1;
 	}
@@ -139,7 +139,7 @@ int getHitPlayer(int x, int y, int hitBoxLength) {
 	int i;
 
 	for (i = 0; i < numPlayers; i++) {
-		if (x > p[i].x - hitBoxLength && x < p[i].x + TANK_LENGTH
+		if (x > p[i].x - hitBoxLength && x < p[i].x + TANK_LENGTH - 1
 				+ hitBoxLength && y > p[i].y - hitBoxLength && y < p[i].y
 				+ TANK_HEIGHT + hitBoxLength) {
 			printf("hit player %i!\n", i);
@@ -182,7 +182,7 @@ void bulletExplode(int x, int y, int bulletType) {
 			hit = 0;
 			for (i = -r; i <= r && hit==0; i++) {
 				offset = sqrt(r * r - i * i);
-				if( x+i >= p[pNumber].x && x+i <= p[pNumber].x + TANK_LENGTH){
+				if( x+i >= p[pNumber].x && x+i <= p[pNumber].x + TANK_LENGTH - 1){
 					for(j = y - offset; j <= y + offset && hit == 0; j++){
 						if(j > p[pNumber].y && j < p[pNumber].y + TANK_HEIGHT){
 							hit = 1;
@@ -215,7 +215,7 @@ void checkPlayerFalling(int pNumber){
 	int TankNotTouchGroundCounter = 0;
 
 	for ( i = p[pNumber].x; i <= p[pNumber].x + TANK_LENGTH; i++){
-		if(field[i] > p[pNumber].y + TANK_HEIGHT + 1){
+		if(field[i] > p[pNumber].y + TANK_HEIGHT){
 			TankNotTouchGroundCounter++;
 		}
 	}

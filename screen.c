@@ -50,53 +50,53 @@ void updateField() {
 	// Draw a rectangle for the field
 	//alt_up_pixel_buffer_dma_draw_rectangle(pixel_buffer, 0, 160, SCREEN_WIDTH
 	//	- 1, SCREEN_HEIGHT - 1, 0xFFFF, 1);
-	int i;
+	int i,j;
+	unsigned int addr;
 	for (i = 0; i < SCREEN_WIDTH; i++) {
-		alt_up_pixel_buffer_dma_draw_line(pixel_buffer, i, SCREEN_HEIGHT - 1,
-				i, field[i], 0xFFFF, 1);
+		for(j = field[i]; j < SCREEN_HEIGHT; j++){
+			addr = (( i & pixel_buffer->x_coord_mask) << 1);
+			addr += (((j & pixel_buffer -> y_coord_mask) * 320) << 1);
+			IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, hyrule[j][i]);
+			//alt_up_pixel_buffer_dma_draw(pixel_buffer,hyrule[j][i],i,j);
+		}
 	}
 }
 
 //prints the prints a player to the screen
 void updatePlayer(int pNumber) {
 	// Draw a rectangle for the field
+	int i,j;
+	unsigned int addr;
 	int x = p[pNumber].x;
 	int y = p[pNumber].y;
 	int colour = p[pNumber].colour;
-	int deg = p[pNumber].deg;
 
-	int i;
-	//printf("\n\n");
-	for (i = 0; i < 16; ++i) {
-		//printf("%x",0x0000+i);
-		alt_up_pixel_buffer_dma_draw(pixel_buffer, 0x000F + i, i, 10);//1
-		alt_up_pixel_buffer_dma_draw(pixel_buffer, 0x00F0 + i, i, 14);//2
-		alt_up_pixel_buffer_dma_draw(pixel_buffer, 0x0F0F + i, i, 18);//3
-		alt_up_pixel_buffer_dma_draw(pixel_buffer, 0x0FF0 + i, i, 22);//4
-		alt_up_pixel_buffer_dma_draw(pixel_buffer, 0x0FFF + i, i, 26);//5
-		alt_up_pixel_buffer_dma_draw(pixel_buffer, 0xF000 + i, i, 30);//6
-		alt_up_pixel_buffer_dma_draw(pixel_buffer, 0xF00F + i, i, 34);//7
-		alt_up_pixel_buffer_dma_draw(pixel_buffer, 0xF0FF + i, i, 38);//8
-		alt_up_pixel_buffer_dma_draw(pixel_buffer, 0xFF00 + i, i, 42);//9
-		alt_up_pixel_buffer_dma_draw(pixel_buffer, 0xFF0F + i, i, 46);//10
-
-		alt_up_pixel_buffer_dma_draw(pixel_buffer, 0xFF00 + 4*i, 10, 50);//yellow
-		alt_up_pixel_buffer_dma_draw(pixel_buffer, 0xF50F + 4*i, 12, 50);//orange
-		alt_up_pixel_buffer_dma_draw(pixel_buffer, 0xF01F + 4*i, 14, 50);//purple
-		alt_up_pixel_buffer_dma_draw(pixel_buffer, 0x0000 + 4*i, 16, 50);//black
-		alt_up_pixel_buffer_dma_draw(pixel_buffer, 0xFFFF + 4*i, 16, 50);//white
-
-
-
-
+	//alt_up_pixel_buffer_dma_draw_rectangle(pixel_buffer, x, y, x + TANK_LENGTH-1,
+			//y + TANK_HEIGHT-1, colour, 1);
+	switch (pNumber) {
+		case pOne:
+			for (i = 0; i < TANK_LENGTH; i++) {
+				for(j = 0; j < TANK_HEIGHT; j++){
+					addr = (( (i+p[pNumber].x) & pixel_buffer->x_coord_mask) << 1);
+					addr += ((((j+p[pNumber].y) & pixel_buffer -> y_coord_mask) * 320) << 1);
+					IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, mario_right[j][i]);
+				}
+			}
+			break;
+		case pTwo:
+			for (i = 0; i < TANK_LENGTH; i++) {
+				for(j = 0; j <TANK_HEIGHT; j++){
+					addr = (( (i+p[pNumber].x) & pixel_buffer->x_coord_mask) << 1);
+					addr += ((((j+p[pNumber].y) & pixel_buffer -> y_coord_mask) * 320) << 1);
+					IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, luigi_right[j][i]);
+				}
+			}
+			break;
 	}
-
-
-	alt_up_pixel_buffer_dma_draw_rectangle(pixel_buffer, x, y, x + TANK_LENGTH,
-			y + TANK_HEIGHT, colour, 1);
-	alt_up_pixel_buffer_dma_draw_line(pixel_buffer, x + TANK_LENGTH / 2, y,
+	/*alt_up_pixel_buffer_dma_draw_line(pixel_buffer, x + TANK_LENGTH / 2, y,
 			x + TANK_LENGTH / 2 + getTurretWidth(deg),
 			y - getTurretHeight(deg), colour, 1);
+	*/
 }
 
 //prints a bullet to the screen
@@ -172,3 +172,14 @@ void printHp(int pNumber) {
 		}
 	}
 }
+
+void drawTest(){
+	int i,j;
+	for(j = 0; j < HYRULE_HEIGHT ; j++){
+		for(i = 0; i < HYRULE_WIDTH ; i++){
+			alt_up_pixel_buffer_dma_draw(pixel_buffer,hyrule[j][i],i,j);
+		}
+	}
+
+}
+

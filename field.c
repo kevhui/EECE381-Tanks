@@ -17,10 +17,18 @@ void initField() {
 //TODO: Make a field generator
 //Generates a field
 void generateField() {
-	int i = 0;
-	for (i = 0; i < SCREEN_WIDTH; i++) {
-		field[i] = SCREEN_HEIGHT * 7 / 10;
+	int i,j;
+
+	for(i = 0; i < HYRULE_WIDTH ; i++){
+		for(j = 0; j < HYRULE_HEIGHT ; j++){
+			//Using white as a mask
+			if (hyrule[j][i] != 0xFFFF){
+				field[i] = j+2;
+				break;
+			}
+		}
 	}
+
 }
 
 //Prints the field out

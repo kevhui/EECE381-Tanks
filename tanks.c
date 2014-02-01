@@ -1,5 +1,5 @@
 /*
- * tanks.h
+ * tanks.c
  * Clone of Tanks using the Altera DE2 Board.
  *
  *	Created: 2014-01-18
@@ -32,12 +32,13 @@ int main(void) {
 	//note HAVE to init field then players
 	initPlayer(pOne, 50, SCREEN_HEIGHT * 7 / 10 - TANK_HEIGHT - 1, 90, 3,
 			0xAAAA, 0, 1, 100);
-	initPlayer(pTwo, 100, SCREEN_HEIGHT * 7 / 10 - TANK_HEIGHT - 1, -90, 3,
+	initPlayer(pTwo, SCREEN_WIDTH*3/4, SCREEN_HEIGHT * 7 / 10 - TANK_HEIGHT - 1, -90, 3,
 			0xCCCC, 0, 1, 100);
 
 	//printField();
 
 	while (1) {
+
 		//printSD();
 		//moves left
 		if (IORD(keys,0) == 8) {
@@ -72,11 +73,13 @@ int main(void) {
 		for (i = 0; i < numPlayers; ++i) {
 			checkPlayerFalling(i);
 			updatePlayer(i);
-			printHp(i);
+			//printHp(i);
 		}
 
 		updateField();
+		//drawTest();
 		updateScreen();
+
 	}
 	/*
 	 printLines();
