@@ -155,32 +155,49 @@ void printString() {
 }
 
 //Prints string
+//TODO: MAKE THIS BETTER
 void printHp(int pNumber) {
-	if(pNumber==0){
-		switch(p[pNumber].hp){
-		case 1:
-			alt_up_char_buffer_string(char_buffer, "Player One: 1HP", 20, 30);
-			break;
-		case 2:
-			alt_up_char_buffer_string(char_buffer, "Player One: 2HP", 20, 30);
-			break;
-		case 3:
-			alt_up_char_buffer_string(char_buffer, "Player One: 3HP", 20, 30);
-			break;
+	if(pNumber==pOne){
+		if(p[pTwo].hp == 0){
+			alt_up_char_buffer_string(char_buffer, "Player One: WINS!", 50, 10);
+		}
+		else{
+			switch(p[pNumber].hp){
+			case 0:
+				alt_up_char_buffer_string(char_buffer, "Player One: X___X", 50, 10);
+				break;
+			case 1:
+				alt_up_char_buffer_string(char_buffer, "Player One: 1HP", 10, 10);
+				break;
+			case 2:
+				alt_up_char_buffer_string(char_buffer, "Player One: 2HP", 10, 10);
+				break;
+			case 3:
+				alt_up_char_buffer_string(char_buffer, "Player One: 3HP", 10, 10);
+				break;
+			}
 		}
 	}
-	else if(pNumber==1){
-		switch(p[pNumber].hp){
-		case 1:
-			alt_up_char_buffer_string(char_buffer, "Player Two: 1HP", 40, 30);
-			break;
-		case 2:
-			alt_up_char_buffer_string(char_buffer, "Player Two: 2HP", 40, 30);
-			break;
-		case 3:
-			alt_up_char_buffer_string(char_buffer, "Player Two: 3HP", 40, 30);
-			break;
-		}
+	else if(pNumber==pTwo){
+			if(p[pOne].hp == 0){
+				alt_up_char_buffer_string(char_buffer, "Player Two: WINS!", 50, 10);
+			}
+			else{
+				switch(p[pNumber].hp){
+				case 0:
+					alt_up_char_buffer_string(char_buffer, "Player Two: X___X", 50, 10);
+					break;
+				case 1:
+					alt_up_char_buffer_string(char_buffer, "Player Two: 1HP", 50, 10);
+					break;
+				case 2:
+					alt_up_char_buffer_string(char_buffer, "Player Two: 2HP", 50, 10);
+					break;
+				case 3:
+					alt_up_char_buffer_string(char_buffer, "Player Two: 3HP", 50, 10);
+					break;
+				}
+			}
 	}
 }
 

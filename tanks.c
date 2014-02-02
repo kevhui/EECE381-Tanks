@@ -71,7 +71,7 @@ int main(void) {
 		for (i = 0; i < numPlayers; ++i) {
 			checkPlayerFalling(i);
 			updatePlayer(i);
-			//printHp(i);
+			printHp(i);
 		}
 		//drawTest();
 		updateScreen();

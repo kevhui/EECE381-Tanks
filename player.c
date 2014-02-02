@@ -130,14 +130,15 @@ void turretFire(int turn, int power) {
 			bulletExplode(screenX, screenY, 1);
 			field[screenX] = field[screenX] + 1;
 			printf("hit ground!\n");
+		}else if(screenX >= SCREEN_WIDTH - 1|| screenX <= 0){
+			bullet_alive = 0;
 		}
-
 	} while (bullet_alive);
 }
 
 //Rotates the turret of given player by one unit clock wise
 void turretCW(int pNumber) {
-	if(p[pNumber].deg + 3 <= 90){
+	if(p[pNumber].deg + 3 <= 120){
 	p[pNumber].deg = p[pNumber].deg + 3;
 	}
 }
@@ -203,8 +204,10 @@ void bulletExplode(int x, int y, int bulletType) {
 		}*/
 		for (i = -r; i <= r; i++) {
 			offset = sqrt(r * r - i * i);
-			for (j = -offset; j <= offset; j++) {
-				map[y+j][x+i] = NOTHING;
+			if( x + i >= 0 && x + i < SCREEN_WIDTH){
+				for (j = -offset; j <= offset; j++) {
+					map[y+j][x+i] = NOTHING;
+				}
 			}
 		}
 		//See if player got hit
@@ -233,8 +236,11 @@ void bulletExplode(int x, int y, int bulletType) {
 		//c is used for a delay and colour effect
 		for (c = 0; c < 25; c += 1) {
 			for (i = -r; i <= r; i++) {
+				printf("explosion: %i \n", x+i);
+				if( x + i >= 0 && x + i < SCREEN_WIDTH){
 				offset = sqrt(r * r - i * i);
 				updateExplosion(x + i, y, offset, colour + c);
+				}
 			}
 		//TODO: cycle players alive
 		for (pNumber = 0; pNumber < numPlayers; ++pNumber) {
