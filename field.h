@@ -13,6 +13,7 @@
 #include <math.h>
 
 extern int field[SCREEN_WIDTH];
+extern int map[SCREEN_HEIGHT][SCREEN_WIDTH];
 
 void initField(void);
 void generateField(void);

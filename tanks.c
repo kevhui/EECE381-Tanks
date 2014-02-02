@@ -17,7 +17,8 @@
 #include "field.h"
 
 struct player p[2];
-int field [SCREEN_WIDTH] ;
+int field [SCREEN_WIDTH];
+int map [SCREEN_HEIGHT][SCREEN_WIDTH];
 int turn = pOne;
 int numPlayers = 2;
 
@@ -65,14 +66,13 @@ int main(void) {
 		//printf("degree: %d \n",p[turn].deg);
 
 		clearScreen();
+		updateField();
 
 		for (i = 0; i < numPlayers; ++i) {
 			checkPlayerFalling(i);
 			updatePlayer(i);
 			//printHp(i);
 		}
-
-		updateField();
 		//drawTest();
 		updateScreen();
 

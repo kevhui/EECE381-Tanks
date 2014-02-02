@@ -17,14 +17,20 @@ void initField() {
 //TODO: Make a field generator
 //Generates a field
 void generateField() {
-	int i,j;
+	int i,j,flag;
+
 
 	for(i = 0; i < HYRULE_WIDTH ; i++){
+		flag = 0;
 		for(j = 0; j < HYRULE_HEIGHT ; j++){
 			//Using white as a mask
-			if (hyrule[j][i] != 0xFFFF){
+			map[j][i] = NOTHING;
+			if (hyrule[j][i] != 0xFFFF && flag == 0){
 				field[i] = j+2;
-				break;
+				flag = 1;
+			}
+			if(flag==1){
+				map[j][i] = hyrule[j][i];
 			}
 		}
 	}

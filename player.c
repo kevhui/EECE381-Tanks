@@ -26,16 +26,30 @@ void initPlayer(int id, int x, int y, int deg, int hp, int colour, int points,
 void moveLeft(int pNumber) {
 	p[pNumber].dir = LEFT;
 	int new_x = p[pNumber].x - 1;
-	if ( new_x >= 0 && field[new_x] > p[pNumber].y + TANK_HEIGHT){
-		p[pNumber].x -= 1;
+
+	int end_y = p[pNumber].y + TANK_HEIGHT - 1;
+	int j;
+	int counter = 0;
+	for(j=p[pNumber].y; j < p[pNumber].y+TANK_HEIGHT-3; j++){
+		if(map[j][new_x] == NOTHING){
+			counter++;
+		}
 	}
-	else if ( new_x >= 0 && field[new_x] == p[pNumber].y + TANK_HEIGHT ){
-		p[pNumber].x -= 1;
-		p[pNumber].y -= 1;
-	}
-	else if ( new_x >= 0 && field[new_x] == p[pNumber].y + TANK_HEIGHT - 1){
-		p[pNumber].x -= 1;
-		p[pNumber].y -= 2;
+	printf("counter %i",counter);
+	if(counter==TANK_HEIGHT-3){
+		if(new_x >= 0){
+			if ((map[end_y][new_x] == NOTHING)&&(map[end_y-1][new_x] == NOTHING)&&(map[end_y-2][new_x] == NOTHING)){
+				p[pNumber].x -= 1;
+			}
+			else if ((map[end_y-1][new_x] == NOTHING)&&(map[end_y-2][new_x] == NOTHING)){
+				p[pNumber].x -= 1;
+				p[pNumber].y -= 1;
+			}
+			else if ((map[end_y-2][new_x] == NOTHING)){
+				p[pNumber].x -= 1;
+				p[pNumber].y -= 2;
+			}
+		}
 	}
 }
 
@@ -43,16 +57,29 @@ void moveLeft(int pNumber) {
 void moveRight(int pNumber) {
 	p[pNumber].dir = RIGHT;
 	int new_x = p[pNumber].x + TANK_LENGTH;
-	if ( new_x < SCREEN_WIDTH && field[new_x] > p[pNumber].y + TANK_HEIGHT ){
-		p[pNumber].x += 1;
+	int end_y = p[pNumber].y + TANK_HEIGHT - 1;
+	int j;
+	int counter = 0;
+	for(j=p[pNumber].y; j < p[pNumber].y+TANK_HEIGHT-3; j++){
+		if(map[j][new_x] == NOTHING){
+			counter++;
+		}
 	}
-	else if ( new_x < SCREEN_WIDTH && field[new_x] == p[pNumber].y + TANK_HEIGHT ){
-		p[pNumber].x += 1;
-		p[pNumber].y -= 1;
-	}
-	else if ( new_x < SCREEN_WIDTH && field[new_x] == p[pNumber].y + TANK_HEIGHT - 1){
-		p[pNumber].x += 1;
-		p[pNumber].y -= 2;
+	printf("counter %i",counter);
+	if(counter==TANK_HEIGHT-3){
+		if(new_x < SCREEN_WIDTH){
+			if ((map[end_y][new_x] == NOTHING)&&(map[end_y-1][new_x] == NOTHING)&&(map[end_y-2][new_x] == NOTHING)){
+				p[pNumber].x += 1;
+			}
+			else if ((map[end_y-1][new_x] == NOTHING)&&(map[end_y-2][new_x] == NOTHING)){
+				p[pNumber].x += 1;
+				p[pNumber].y -= 1;
+			}
+			else if ((map[end_y-2][new_x] == NOTHING)){
+				p[pNumber].x += 1;
+				p[pNumber].y -= 2;
+			}
+		}
 	}
 }
 
@@ -84,8 +111,8 @@ void turretFire(int turn, int power) {
 		for (i = 0; i < numPlayers; ++i) {
 			updatePlayer(i);
 		}
-		updateBullet(b.x / PIXEL_SCALE, b.y / PIXEL_SCALE);
 		updateField();
+		updateBullet(b.x / PIXEL_SCALE, b.y / PIXEL_SCALE);
 		updateScreen();
 
 
@@ -139,9 +166,9 @@ int getHitPlayer(int x, int y, int hitBoxLength) {
 	int i;
 
 	for (i = 0; i < numPlayers; i++) {
-		if (x > p[i].x - hitBoxLength && x < p[i].x + TANK_LENGTH - 1
+		if ((x > p[i].x - hitBoxLength && x < p[i].x + TANK_LENGTH - 1
 				+ hitBoxLength && y > p[i].y - hitBoxLength && y < p[i].y
-				+ TANK_HEIGHT + hitBoxLength) {
+				+ TANK_HEIGHT + hitBoxLength)&& map[y][x]!=NOTHING) {
 			printf("hit player %i!\n", i);
 			return 1;
 		}
@@ -151,7 +178,7 @@ int getHitPlayer(int x, int y, int hitBoxLength) {
 }
 
 int getHitGround(int x, int y, int bulletType) {
-	if (y >= field[x] - 1) {
+	if ((y >= field[x] - 1) && map[y][x]!=NOTHING) {
 		printf("hit ground!\n");
 		return 1;
 	}
@@ -159,23 +186,28 @@ int getHitGround(int x, int y, int bulletType) {
 }
 
 void bulletExplode(int x, int y, int bulletType) {
-	int r, i, colour, offset, pNumber;
+	int r,j, i, colour, offset, pNumber;
 	volatile int c = 2;
 	switch (bulletType) {
 	case 1:
 		r = 8;//set the radius of the bullet
 		colour = 0xF7FD;
 		//Remove pixels from the field
-		for (i = -r; i <= r; i++) {
+		/*for (i = -r; i <= r; i++) {
 			offset = sqrt(r * r - i * i);
 			if (field[x + i] < y + offset) {
 				//printf("y;%i \t field[x+i]: %i \ty-field[x+i]:%i \t offset:%i\t min: %i",	y,field[x + i],y - field[x + i],offset,(((y - field[x + i]) < offset) ? (y - field[x + i]): offset));
 				field[x + i] = (y + offset - field[x + i] < 2 * offset) ? y + offset : field[x + i] + 2 * offset;
 				//printf("\t newfield[x]:%i \n", field[x + i]);
 			}
+		}*/
+		for (i = -r; i <= r; i++) {
+			offset = sqrt(r * r - i * i);
+			for (j = -offset; j <= offset; j++) {
+				map[y+j][x+i] = NOTHING;
+			}
 		}
 		//See if player got hit
-		int j; //explosion_y
 		int hit;
 		for(pNumber = 0; pNumber < numPlayers; pNumber++){
 		//TODO: got thought alive players only
@@ -198,6 +230,7 @@ void bulletExplode(int x, int y, int bulletType) {
 		}
 
 		//Draw the explosion
+		//c is used for a delay and colour effect
 		for (c = 0; c < 25; c += 1) {
 			for (i = -r; i <= r; i++) {
 				offset = sqrt(r * r - i * i);

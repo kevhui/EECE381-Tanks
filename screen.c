@@ -56,7 +56,7 @@ void updateField() {
 		for(j = field[i]; j < SCREEN_HEIGHT; j++){
 			addr = (( i & pixel_buffer->x_coord_mask) << 1);
 			addr += (((j & pixel_buffer -> y_coord_mask) * 320) << 1);
-			IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, hyrule[j][i]);
+			IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, map[j][i]);
 			//alt_up_pixel_buffer_dma_draw(pixel_buffer,hyrule[j][i],i,j);
 		}
 	}

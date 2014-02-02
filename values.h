@@ -18,7 +18,7 @@
 #define pThree 2
 #define pFour 3
 #define pFive 5
-#define NOTHING 9
+#define NOTHING 0x0000
 #define GROUND 8
 #define RIGHT 1
 #define LEFT -1
