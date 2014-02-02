@@ -20,8 +20,8 @@
 #define pFive 5
 #define NOTHING 9
 #define GROUND 8
-#define RIGHT 0
-#define LEFT 1
+#define RIGHT 1
+#define LEFT -1
 
 struct player{
 	int x;

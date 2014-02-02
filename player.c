@@ -64,8 +64,8 @@ void turretFire(int turn, int power) {
 	int i;
 	int bullet_alive = 1;
 	int screenX, screenY;
-	int turret_start_x = p[turn].x + TANK_LENGTH/2 + getTurretWidth(p[turn].deg);
-	int turret_start_y = p[turn].y + TANK_HEIGHT/2 - getTurretHeight(p[turn].deg);
+	int turret_start_x = p[turn].x + TANK_LENGTH/2 + getTurretWidth(p[turn].deg*p[turn].dir);
+	int turret_start_y = p[turn].y + TANK_HEIGHT/2 - getTurretHeight(p[turn].deg*p[turn].dir);
 	b.x = (turret_start_x) * PIXEL_SCALE;
 	b.y = (turret_start_y) * PIXEL_SCALE;
 	b.dx = (turret_start_x - (p[turn].x + TANK_LENGTH / 2)) * power;
@@ -110,14 +110,14 @@ void turretFire(int turn, int power) {
 
 //Rotates the turret of given player by one unit clock wise
 void turretCW(int pNumber) {
-	if(p[pNumber].deg + 3 < 90){
+	if(p[pNumber].deg + 3 <= 90){
 	p[pNumber].deg = p[pNumber].deg + 3;
 	}
 }
 
 //Rotates the turret of given player by one unit counter clock wise
 void turretCCW(int pNumber) {
-	if(p[pNumber].deg + 3 > -90){
+	if(p[pNumber].deg - 3 >= 0){
 	p[pNumber].deg = p[pNumber].deg - 3;
 	}
 }

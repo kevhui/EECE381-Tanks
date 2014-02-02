@@ -100,7 +100,7 @@ void updatePlayer(int pNumber) {
 			break;
 	}
 	if(turn == pNumber){
-		int deg = p[pNumber].deg;
+		int deg = p[pNumber].deg*p[pNumber].dir;
 		int t_startX = x + TANK_LENGTH/2 + getTurretWidth(deg)*2/3;
 		int t_startY = y + TANK_HEIGHT/2 - getTurretHeight(deg)*2/3;
 		int t_endX = x + TANK_LENGTH/2 + getTurretWidth(deg);
