@@ -12,7 +12,7 @@
 #define VERBOSE 0
 #define TANK_LENGTH 19
 #define TANK_HEIGHT 19
-#define TURRET_LENGTH 10
+#define TURRET_LENGTH 22
 #define pOne 0
 #define pTwo 1
 #define pThree 2

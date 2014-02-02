@@ -99,10 +99,15 @@ void updatePlayer(int pNumber) {
 			}
 			break;
 	}
-	/*alt_up_pixel_buffer_dma_draw_line(pixel_buffer, x + TANK_LENGTH / 2, y,
-			x + TANK_LENGTH / 2 + getTurretWidth(deg),
-			y - getTurretHeight(deg), colour, 1);
-	*/
+	if(turn == pNumber){
+		int deg = p[pNumber].deg;
+		int t_startX = x + TANK_LENGTH/2 + getTurretWidth(deg)*2/3;
+		int t_startY = y + TANK_HEIGHT/2 - getTurretHeight(deg)*2/3;
+		int t_endX = x + TANK_LENGTH/2 + getTurretWidth(deg);
+		int t_endY = y + TANK_HEIGHT/2 - getTurretHeight(deg);
+
+		alt_up_pixel_buffer_dma_draw_line(pixel_buffer,t_startX,t_startY,t_endX,t_endY, colour, 1);
+	}
 }
 
 //prints a bullet to the screen

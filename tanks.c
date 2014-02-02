@@ -30,12 +30,8 @@ int main(void) {
 	initField();
 
 	//note HAVE to init field then players
-	initPlayer(pOne, 50, SCREEN_HEIGHT * 7 / 10 - TANK_HEIGHT - 1, 90, 3,
-			0xAAAA, 0, 1, 100);
-	initPlayer(pTwo, SCREEN_WIDTH*3/4, SCREEN_HEIGHT * 7 / 10 - TANK_HEIGHT - 1, -90, 3,
-			0xCCCC, 0, 1, 100);
-
-	//printField();
+	initPlayer(pOne, 50, SCREEN_HEIGHT * 7 / 10 - TANK_HEIGHT - 1, 90, 3, 0x4800, 0, 1, 100, RIGHT);
+	initPlayer(pTwo, SCREEN_WIDTH*3/4, SCREEN_HEIGHT * 7 / 10 - TANK_HEIGHT - 1, -90, 3, 0x4648, 0, 1, 100, LEFT);
 
 	while (1) {
 
