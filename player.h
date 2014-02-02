@@ -17,7 +17,7 @@ extern struct player p[2];
 extern int numPlayers;
 extern int turn;
 
-void initPlayer(int,int,int,int,int,int,int,int,int);
+void initPlayer(int,int,int,int,int,int,int,int,int,int);
 void moveLeft(int);
 void moveRight(int);
 void turretCW(int);

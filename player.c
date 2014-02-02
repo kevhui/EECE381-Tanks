@@ -9,7 +9,7 @@
 
 //Initialises the player by the passed in arguments
 void initPlayer(int id, int x, int y, int deg, int hp, int colour, int points,
-		int alive, int gas) {
+		int alive, int gas, int dir) {
 	p[id].x = x;
 	p[id].y = y;
 	p[id].deg = deg;
@@ -18,11 +18,13 @@ void initPlayer(int id, int x, int y, int deg, int hp, int colour, int points,
 	p[id].points = points;
 	p[id].alive = alive;
 	p[id].gas = gas;
+	p[id].dir = dir;
 
 }
 
 //moves the specified player one unit left if possible
 void moveLeft(int pNumber) {
+	p[pNumber].dir = LEFT;
 	int new_x = p[pNumber].x - 1;
 	if ( new_x >= 0 && field[new_x] > p[pNumber].y + TANK_HEIGHT){
 		p[pNumber].x -= 1;
@@ -39,6 +41,7 @@ void moveLeft(int pNumber) {
 
 //moves the specified player one unit right if possible
 void moveRight(int pNumber) {
+	p[pNumber].dir = RIGHT;
 	int new_x = p[pNumber].x + TANK_LENGTH;
 	if ( new_x < SCREEN_WIDTH && field[new_x] > p[pNumber].y + TANK_HEIGHT ){
 		p[pNumber].x += 1;

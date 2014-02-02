@@ -79,7 +79,10 @@ void updatePlayer(int pNumber) {
 				for(j = 0; j < TANK_HEIGHT; j++){
 					addr = (( (i+p[pNumber].x) & pixel_buffer->x_coord_mask) << 1);
 					addr += ((((j+p[pNumber].y) & pixel_buffer -> y_coord_mask) * 320) << 1);
-					IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, mario_right[j][i]);
+					if(p[pNumber].dir == RIGHT){
+						IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, mario_right[j][i]);}
+					else if(p[pNumber].dir == LEFT){
+						IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, mario_left[j][i]);}
 				}
 			}
 			break;
@@ -88,7 +91,10 @@ void updatePlayer(int pNumber) {
 				for(j = 0; j <TANK_HEIGHT; j++){
 					addr = (( (i+p[pNumber].x) & pixel_buffer->x_coord_mask) << 1);
 					addr += ((((j+p[pNumber].y) & pixel_buffer -> y_coord_mask) * 320) << 1);
-					IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, luigi_right[j][i]);
+					if(p[pNumber].dir == RIGHT){
+						IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, luigi_right[j][i]);}
+					else if(p[pNumber].dir == LEFT){
+						IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, luigi_left[j][i]);}
 				}
 			}
 			break;
