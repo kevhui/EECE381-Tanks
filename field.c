@@ -19,19 +19,22 @@ void initField() {
 void generateField() {
 	int i,j,flag;
 
-
 	for(i = 0; i < HYRULE_WIDTH ; i++){
 		flag = 0;
 		for(j = 0; j < HYRULE_HEIGHT ; j++){
 			//Using white as a mask
-			map[j][i] = NOTHING;
-			if (hyrule[j][i] != 0xFFFF && flag == 0){
-				field[i] = j+2;
-				flag = 1;
-			}
-			if(flag==1){
+			if (flag == 1){
 				map[j][i] = hyrule[j][i];
 			}
+			else{
+			map[j][i] = NOTHING;
+			}
+			if (hyrule[j][i] != 0xFFFF && flag == 0){
+				field[i] = j-2;
+				map[j-1][i] = NOTHING;
+				flag = 1;
+			}
+
 		}
 	}
 

@@ -26,7 +26,6 @@ void initPlayer(int id, int x, int y, int deg, int hp, int colour, int points,
 void moveLeft(int pNumber) {
 	p[pNumber].dir = LEFT;
 	int new_x = p[pNumber].x - 1;
-
 	int end_y = p[pNumber].y + TANK_HEIGHT - 1;
 	int j;
 	int counter = 0;
@@ -74,6 +73,7 @@ void moveRight(int pNumber) {
 			else if ((map[end_y-1][new_x] == NOTHING)&&(map[end_y-2][new_x] == NOTHING)){
 				p[pNumber].x += 1;
 				p[pNumber].y -= 1;
+				printf("two");
 			}
 			else if ((map[end_y-2][new_x] == NOTHING)){
 				p[pNumber].x += 1;
@@ -108,10 +108,10 @@ void turretFire(int turn, int power) {
 
 		clearScreen();
 		//TODO: loop through alive players
+		updateField();
 		for (i = 0; i < numPlayers; ++i) {
 			updatePlayer(i);
 		}
-		updateField();
 		updateBullet(b.x / PIXEL_SCALE, b.y / PIXEL_SCALE);
 		updateScreen();
 
@@ -166,9 +166,9 @@ int getHitPlayer(int x, int y, int hitBoxLength) {
 	int i;
 
 	for (i = 0; i < numPlayers; i++) {
-		if ((x > p[i].x - hitBoxLength && x < p[i].x + TANK_LENGTH - 1
+		if (x > p[i].x - hitBoxLength && x < p[i].x + TANK_LENGTH - 1
 				+ hitBoxLength && y > p[i].y - hitBoxLength && y < p[i].y
-				+ TANK_HEIGHT + hitBoxLength)&& map[y][x]!=NOTHING) {
+				+ TANK_HEIGHT + hitBoxLength) {
 			printf("hit player %i!\n", i);
 			return 1;
 		}
@@ -236,6 +236,10 @@ void bulletExplode(int x, int y, int bulletType) {
 				offset = sqrt(r * r - i * i);
 				updateExplosion(x + i, y, offset, colour + c);
 			}
+		//TODO: cycle players alive
+		for (pNumber = 0; pNumber < numPlayers; ++pNumber) {
+			updatePlayer(i);
+		}
 		updateScreen();
 		}
 		break;
@@ -247,13 +251,13 @@ void checkPlayerFalling(int pNumber){
 	int i;
 	int TankNotTouchGroundCounter = 0;
 
-	for ( i = p[pNumber].x; i <= p[pNumber].x + TANK_LENGTH; i++){
-		if(field[i] > p[pNumber].y + TANK_HEIGHT){
+	for ( i = p[pNumber].x; i < p[pNumber].x + TANK_LENGTH; i++){
+		if(map[p[pNumber].y + TANK_HEIGHT][i] == NOTHING){
 			TankNotTouchGroundCounter++;
 		}
 	}
 	//printf("TankNotTouchGroundCounter: %i\n", TankNotTouchGroundCounter);
-	if( TankNotTouchGroundCounter == TANK_LENGTH + 1){
+	if( TankNotTouchGroundCounter == TANK_LENGTH){
 		p[pNumber].y++;
 	}
 }
