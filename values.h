@@ -22,8 +22,10 @@
 #define GROUND 8
 #define RIGHT 1
 #define LEFT -1
+#define LEFT_ARROW 0x6b
+#define SPACEBAR 0x29
 
-struct player{
+typedef struct player{
 	int x;
 	int y;
 	int deg;
@@ -33,7 +35,9 @@ struct player{
 	int alive;
 	int gas;
 	int dir;
-};
+	char name[10];
+	int type;
+} player;
 
 struct bullet{
 	int x;

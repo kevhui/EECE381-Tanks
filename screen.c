@@ -50,11 +50,11 @@ void updateField() {
 	// Draw a rectangle for the field
 	//alt_up_pixel_buffer_dma_draw_rectangle(pixel_buffer, 0, 160, SCREEN_WIDTH
 	//	- 1, SCREEN_HEIGHT - 1, 0xFFFF, 1);
-	int i,j;
+	int i, j;
 	unsigned int addr;
 	for (i = 0; i < SCREEN_WIDTH; i++) {
-		for(j = field[i]; j < SCREEN_HEIGHT; j++){
-			addr = (( i & pixel_buffer->x_coord_mask) << 1);
+		for (j = field[i]; j < SCREEN_HEIGHT; j++) {
+			addr = ((i & pixel_buffer->x_coord_mask) << 1);
 			addr += (((j & pixel_buffer -> y_coord_mask) * 320) << 1);
 			IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, map[j][i]);
 			//alt_up_pixel_buffer_dma_draw(pixel_buffer,hyrule[j][i],i,j);
@@ -65,48 +65,53 @@ void updateField() {
 //prints the prints a player to the screen
 void updatePlayer(int pNumber) {
 	// Draw a rectangle for the field
-	int i,j;
+	int i, j;
 	unsigned int addr;
 	int x = p[pNumber].x;
 	int y = p[pNumber].y;
 	int colour = p[pNumber].colour;
 
 	//alt_up_pixel_buffer_dma_draw_rectangle(pixel_buffer, x, y, x + TANK_LENGTH-1,
-			//y + TANK_HEIGHT-1, colour, 1);
+	//y + TANK_HEIGHT-1, colour, 1);
 	switch (pNumber) {
-		case pOne:
-			for (i = 0; i < TANK_LENGTH; i++) {
-				for(j = 0; j < TANK_HEIGHT; j++){
-					addr = (( (i+p[pNumber].x) & pixel_buffer->x_coord_mask) << 1);
-					addr += ((((j+p[pNumber].y) & pixel_buffer -> y_coord_mask) * 320) << 1);
-					if(p[pNumber].dir == RIGHT){
-						IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, mario_right[j][i]);}
-					else if(p[pNumber].dir == LEFT){
-						IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, mario_left[j][i]);}
+	case pOne:
+		for (i = 0; i < TANK_LENGTH; i++) {
+			for (j = 0; j < TANK_HEIGHT; j++) {
+				addr = (((i + p[pNumber].x) & pixel_buffer->x_coord_mask) << 1);
+				addr += ((((j + p[pNumber].y) & pixel_buffer -> y_coord_mask)
+						* 320) << 1);
+				if (p[pNumber].dir == RIGHT) {
+					IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, mario_right[j][i]);
+				} else if (p[pNumber].dir == LEFT) {
+					IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, mario_left[j][i]);
 				}
 			}
-			break;
-		case pTwo:
-			for (i = 0; i < TANK_LENGTH; i++) {
-				for(j = 0; j <TANK_HEIGHT; j++){
-					addr = (( (i+p[pNumber].x) & pixel_buffer->x_coord_mask) << 1);
-					addr += ((((j+p[pNumber].y) & pixel_buffer -> y_coord_mask) * 320) << 1);
-					if(p[pNumber].dir == RIGHT){
-						IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, luigi_right[j][i]);}
-					else if(p[pNumber].dir == LEFT){
-						IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, luigi_left[j][i]);}
+		}
+		break;
+	case pTwo:
+		for (i = 0; i < TANK_LENGTH; i++) {
+			for (j = 0; j < TANK_HEIGHT; j++) {
+				addr = (((i + p[pNumber].x) & pixel_buffer->x_coord_mask) << 1);
+				addr += ((((j + p[pNumber].y) & pixel_buffer -> y_coord_mask)
+						* 320) << 1);
+				if (p[pNumber].dir == RIGHT) {
+					IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, luigi_right[j][i]);
+				} else if (p[pNumber].dir == LEFT) {
+					IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, luigi_left[j][i]);
 				}
 			}
-			break;
+		}
+		break;
 	}
-	if(turn == pNumber){
-		int deg = p[pNumber].deg*p[pNumber].dir;
-		int t_startX = x + TANK_LENGTH/2 + getTurretWidth(deg)*2/3;
-		int t_startY = y + TANK_HEIGHT/2 - getTurretHeight(deg)*2/3;
-		int t_endX = x + TANK_LENGTH/2 + getTurretWidth(deg);
-		int t_endY = y + TANK_HEIGHT/2 - getTurretHeight(deg);
+	if (turn == pNumber) {
+		int deg = p[pNumber].deg * p[pNumber].dir;
+		int t_startX = x + TANK_LENGTH / 2 + getTurretWidth(deg) * 2 / 3;
+		int t_startY = y + TANK_HEIGHT / 2 - getTurretHeight(deg) * 2 / 3;
+		int t_endX = x + TANK_LENGTH / 2 + getTurretWidth(deg);
+		int t_endY = y + TANK_HEIGHT / 2 - getTurretHeight(deg);
 
-		alt_up_pixel_buffer_dma_draw_line(pixel_buffer,t_startX,t_startY,t_endX,t_endY, colour, 1);
+		alt_up_pixel_buffer_dma_draw_line(pixel_buffer, t_startX, t_startY,
+				t_endX, t_endY, colour, 1);
 	}
 }
 
@@ -117,9 +122,10 @@ void updateBullet(int x, int y) {
 }
 
 //draws a circle as an explosion
-void updateExplosion(int x, int y, int offset,int colour) {
+void updateExplosion(int x, int y, int offset, int colour) {
 	//The first two draw lines is to clean up the circle
-	alt_up_pixel_buffer_dma_draw_line(pixel_buffer, x, y+offset, x, y-offset,colour, 1);
+	alt_up_pixel_buffer_dma_draw_line(pixel_buffer, x, y + offset, x,
+			y - offset, colour, 1);
 }
 
 //prints lines
@@ -143,71 +149,77 @@ void printLines() {
 	alt_up_pixel_buffer_dma_draw_line(pixel_buffer, 0, 0, 320, 240, 0xFFFF, 0);
 }
 
-void initCharBuffer(){
+void initCharBuffer() {
 	char_buffer = alt_up_char_buffer_open_dev("/dev/char_drawer");
 	alt_up_char_buffer_init(char_buffer);
 }
 
 //Prints string
-void printString() {
+void printString(char *out_string, int x, int y) {
 	// Write some text
-	alt_up_char_buffer_string(char_buffer, "EECE 381", 40, 30);
+	alt_up_char_buffer_string(char_buffer, out_string, x, y);
 }
 
 //Prints string
 //TODO: MAKE THIS BETTER
 void printHp(int pNumber) {
-	if(pNumber==pOne){
-		if(p[pTwo].hp == 0){
-			alt_up_char_buffer_string(char_buffer, "Player One: WINS!", 50, 10);
+	alt_up_char_buffer_string(char_buffer, p[pOne].name, 10, 10);
+	alt_up_char_buffer_string(char_buffer, p[pTwo].name, 50, 10);
+	/*if (p[pOne].colour==1)alt_up_char_buffer_string(char_buffer, "BLUE", 10, 14);
+	else if (p[pOne].colour==0) alt_up_char_buffer_string(char_buffer, "PINK", 10, 14);
+	if (p[pTwo].colour==1)alt_up_char_buffer_string(char_buffer, "BLUE", 50, 14);
+	else if (p[pTwo].colour==0) alt_up_char_buffer_string(char_buffer,"PINK", 50, 14);
+	if (p[pOne].type==1)alt_up_char_buffer_string(char_buffer, "REAL", 10, 18);
+	else if (p[pOne].type==0) alt_up_char_buffer_string(char_buffer, "COMP", 10, 18);
+	if (p[pTwo].type==1)alt_up_char_buffer_string(char_buffer, "REAL", 50, 18);
+	else if (p[pTwo].type==0) alt_up_char_buffer_string(char_buffer, "COMP", 50, 18);
+*/
+
+	if (p[pTwo].hp == 0) {
+		alt_up_char_buffer_string(char_buffer, ": WINS!", 20, 10);
+		alt_up_char_buffer_string(char_buffer, ": X___X", 60, 10);
+	} else if (p[pOne].hp == 0) {
+		alt_up_char_buffer_string(char_buffer, ": X___X", 20, 10);
+		alt_up_char_buffer_string(char_buffer, ": WINS!", 60, 10);
+	} else if (pNumber == pOne) {
+
+		switch (p[pNumber].hp) {
+		case 1:
+			alt_up_char_buffer_string(char_buffer, ": 1HP", 20, 10);
+			break;
+		case 2:
+			alt_up_char_buffer_string(char_buffer, ": 2HP", 20, 10);
+			break;
+		case 3:
+			alt_up_char_buffer_string(char_buffer, ": 3HP", 20, 10);
+			break;
 		}
-		else{
-			switch(p[pNumber].hp){
-			case 0:
-				alt_up_char_buffer_string(char_buffer, "Player One: X___X", 50, 10);
-				break;
-			case 1:
-				alt_up_char_buffer_string(char_buffer, "Player One: 1HP", 10, 10);
-				break;
-			case 2:
-				alt_up_char_buffer_string(char_buffer, "Player One: 2HP", 10, 10);
-				break;
-			case 3:
-				alt_up_char_buffer_string(char_buffer, "Player One: 3HP", 10, 10);
-				break;
-			}
+	} else if (pNumber == pTwo) {
+		switch (p[pNumber].hp) {
+		case 1:
+			alt_up_char_buffer_string(char_buffer, ": 1HP", 60, 10);
+			break;
+		case 2:
+			alt_up_char_buffer_string(char_buffer, ": 2HP", 60, 10);
+			break;
+		case 3:
+			alt_up_char_buffer_string(char_buffer, ": 3HP", 60, 10);
+			break;
 		}
-	}
-	else if(pNumber==pTwo){
-			if(p[pOne].hp == 0){
-				alt_up_char_buffer_string(char_buffer, "Player Two: WINS!", 50, 10);
-			}
-			else{
-				switch(p[pNumber].hp){
-				case 0:
-					alt_up_char_buffer_string(char_buffer, "Player Two: X___X", 50, 10);
-					break;
-				case 1:
-					alt_up_char_buffer_string(char_buffer, "Player Two: 1HP", 50, 10);
-					break;
-				case 2:
-					alt_up_char_buffer_string(char_buffer, "Player Two: 2HP", 50, 10);
-					break;
-				case 3:
-					alt_up_char_buffer_string(char_buffer, "Player Two: 3HP", 50, 10);
-					break;
-				}
-			}
 	}
 }
 
-void drawTest(){
-	int i,j;
-	for(j = 0; j < HYRULE_HEIGHT ; j++){
-		for(i = 0; i < HYRULE_WIDTH ; i++){
-			alt_up_pixel_buffer_dma_draw(pixel_buffer,hyrule[j][i],i,j);
+void drawTest() {
+	int i, j;
+	for (j = 0; j < HYRULE_HEIGHT; j++) {
+		for (i = 0; i < HYRULE_WIDTH; i++) {
+			alt_up_pixel_buffer_dma_draw(pixel_buffer, hyrule[j][i], i, j);
 		}
 	}
 
+}
+
+void clearCharBuffer() {
+	alt_up_char_buffer_clear(char_buffer);
 }
 

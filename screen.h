@@ -24,13 +24,15 @@ void initScreen(void);
 void initCharBuffer(void);
 void clearScreen(void);
 void updateScreen(void);
+void drawField(void);
 void updateField(void);
 void updatePlayer(int);
 void updateBullet(int,int);
 void updateExplosion(int,int,int,int);
 void printLines(void);
-void printString(void);
+void printString(char*,int,int);
 void printHp(int);
 void drawTest(void);
+void clearCharBuffer(void);
 
 #endif

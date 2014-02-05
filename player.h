@@ -12,12 +12,13 @@
 #include "values.h"
 #include <math.h>
 #include <unistd.h>
+#include <string.h>
 
-extern struct player p[2];
+extern struct player p[3];
 extern int numPlayers;
 extern int turn;
 
-void initPlayer(int,int,int,int,int,int,int,int,int,int);
+void kevininitPlayer(int,int,int,int,int,int,int,int,int,int,char*);
 void moveLeft(int);
 void moveRight(int);
 void turretCW(int);

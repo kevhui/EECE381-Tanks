@@ -7,19 +7,18 @@
 
 #include "player.h"
 
-//Initialises the player by the passed in arguments
-void initPlayer(int id, int x, int y, int deg, int hp, int colour, int points,
-		int alive, int gas, int dir) {
-	p[id].x = x;
-	p[id].y = y;
-	p[id].deg = deg;
-	p[id].hp = hp;
-	p[id].colour = colour;
-	p[id].points = points;
-	p[id].alive = alive;
-	p[id].gas = gas;
-	p[id].dir = dir;
 
+void kevininitPlayer(int pNumber, int x, int y, int deg, int hp, int colour, int points,int alive, int gas, int dir, char *name) {
+	p[pNumber].x = x;
+	p[pNumber].y = y;
+	p[pNumber].deg = deg;
+	p[pNumber].hp = hp;
+	p[pNumber].colour = colour;
+	p[pNumber].points = points;
+	p[pNumber].alive = alive;
+	p[pNumber].gas = gas;
+	strcpy((p[pNumber].name), name);
+	p[pNumber].dir = dir;
 }
 
 //moves the specified player one unit left if possible
@@ -34,7 +33,7 @@ void moveLeft(int pNumber) {
 			counter++;
 		}
 	}
-	printf("counter %i",counter);
+	//printf("counter %i",counter);
 	if(counter==TANK_HEIGHT-3){
 		if(new_x >= 0){
 			if ((map[end_y][new_x] == NOTHING)&&(map[end_y-1][new_x] == NOTHING)&&(map[end_y-2][new_x] == NOTHING)){
@@ -64,7 +63,7 @@ void moveRight(int pNumber) {
 			counter++;
 		}
 	}
-	printf("counter %i",counter);
+	//printf("counter %i",counter);
 	if(counter==TANK_HEIGHT-3){
 		if(new_x < SCREEN_WIDTH){
 			if ((map[end_y][new_x] == NOTHING)&&(map[end_y-1][new_x] == NOTHING)&&(map[end_y-2][new_x] == NOTHING)){
@@ -73,7 +72,7 @@ void moveRight(int pNumber) {
 			else if ((map[end_y-1][new_x] == NOTHING)&&(map[end_y-2][new_x] == NOTHING)){
 				p[pNumber].x += 1;
 				p[pNumber].y -= 1;
-				printf("two");
+				//printf("two");
 			}
 			else if ((map[end_y-2][new_x] == NOTHING)){
 				p[pNumber].x += 1;
