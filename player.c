@@ -7,8 +7,8 @@
 
 #include "player.h"
 
-
-void kevininitPlayer(int pNumber, int x, int y, int deg, int hp, int colour, int points,int alive, int gas, int dir, char *name) {
+void kevininitPlayer(int pNumber, int x, int y, int deg, int hp, int colour,
+		int points, int alive, int gas, int dir, char *name) {
 	p[pNumber].x = x;
 	p[pNumber].y = y;
 	p[pNumber].deg = deg;
@@ -28,22 +28,22 @@ void moveLeft(int pNumber) {
 	int end_y = p[pNumber].y + TANK_HEIGHT - 1;
 	int j;
 	int counter = 0;
-	for(j=p[pNumber].y; j < p[pNumber].y+TANK_HEIGHT-3; j++){
-		if(map[j][new_x] == NOTHING){
+	for (j = p[pNumber].y; j < p[pNumber].y + TANK_HEIGHT - 3; j++) {
+		if (map[j][new_x] == NOTHING) {
 			counter++;
 		}
 	}
 	//printf("counter %i",counter);
-	if(counter==TANK_HEIGHT-3){
-		if(new_x >= 0){
-			if ((map[end_y][new_x] == NOTHING)&&(map[end_y-1][new_x] == NOTHING)&&(map[end_y-2][new_x] == NOTHING)){
+	if (counter == TANK_HEIGHT - 3) {
+		if (new_x >= 0) {
+			if ((map[end_y][new_x] == NOTHING) && (map[end_y - 1][new_x]
+					== NOTHING) && (map[end_y - 2][new_x] == NOTHING)) {
 				p[pNumber].x -= 1;
-			}
-			else if ((map[end_y-1][new_x] == NOTHING)&&(map[end_y-2][new_x] == NOTHING)){
+			} else if ((map[end_y - 1][new_x] == NOTHING)
+					&& (map[end_y - 2][new_x] == NOTHING)) {
 				p[pNumber].x -= 1;
 				p[pNumber].y -= 1;
-			}
-			else if ((map[end_y-2][new_x] == NOTHING)){
+			} else if ((map[end_y - 2][new_x] == NOTHING)) {
 				p[pNumber].x -= 1;
 				p[pNumber].y -= 2;
 			}
@@ -58,23 +58,23 @@ void moveRight(int pNumber) {
 	int end_y = p[pNumber].y + TANK_HEIGHT - 1;
 	int j;
 	int counter = 0;
-	for(j=p[pNumber].y; j < p[pNumber].y+TANK_HEIGHT-3; j++){
-		if(map[j][new_x] == NOTHING){
+	for (j = p[pNumber].y; j < p[pNumber].y + TANK_HEIGHT - 3; j++) {
+		if (map[j][new_x] == NOTHING) {
 			counter++;
 		}
 	}
 	//printf("counter %i",counter);
-	if(counter==TANK_HEIGHT-3){
-		if(new_x < SCREEN_WIDTH){
-			if ((map[end_y][new_x] == NOTHING)&&(map[end_y-1][new_x] == NOTHING)&&(map[end_y-2][new_x] == NOTHING)){
+	if (counter == TANK_HEIGHT - 3) {
+		if (new_x < SCREEN_WIDTH) {
+			if ((map[end_y][new_x] == NOTHING) && (map[end_y - 1][new_x]
+					== NOTHING) && (map[end_y - 2][new_x] == NOTHING)) {
 				p[pNumber].x += 1;
-			}
-			else if ((map[end_y-1][new_x] == NOTHING)&&(map[end_y-2][new_x] == NOTHING)){
+			} else if ((map[end_y - 1][new_x] == NOTHING)
+					&& (map[end_y - 2][new_x] == NOTHING)) {
 				p[pNumber].x += 1;
 				p[pNumber].y -= 1;
 				//printf("two");
-			}
-			else if ((map[end_y-2][new_x] == NOTHING)){
+			} else if ((map[end_y - 2][new_x] == NOTHING)) {
 				p[pNumber].x += 1;
 				p[pNumber].y -= 2;
 			}
@@ -90,8 +90,10 @@ void turretFire(int turn, int power) {
 	int i;
 	int bullet_alive = 1;
 	int screenX, screenY;
-	int turret_start_x = p[turn].x + TANK_LENGTH/2 + getTurretWidth(p[turn].deg*p[turn].dir);
-	int turret_start_y = p[turn].y + TANK_HEIGHT/2 - getTurretHeight(p[turn].deg*p[turn].dir);
+	int turret_start_x = p[turn].x + TANK_LENGTH / 2 + getTurretWidth(
+			p[turn].deg * p[turn].dir);
+	int turret_start_y = p[turn].y + TANK_HEIGHT / 2 - getTurretHeight(
+			p[turn].deg * p[turn].dir);
 	b.x = (turret_start_x) * PIXEL_SCALE;
 	b.y = (turret_start_y) * PIXEL_SCALE;
 	b.dx = (turret_start_x - (p[turn].x + TANK_LENGTH / 2)) * power;
@@ -105,15 +107,14 @@ void turretFire(int turn, int power) {
 		b.x += b.dx;
 		b.y += b.dy;
 
-		clearScreen();
+		//clearScreen();
 		//TODO: loop through alive players
-		updateField();
+		//updateField();
 		for (i = 0; i < numPlayers; ++i) {
 			updatePlayer(i);
 		}
 		updateBullet(b.x / PIXEL_SCALE, b.y / PIXEL_SCALE);
 		updateScreen();
-
 
 		screenX = b.x / PIXEL_SCALE;
 		screenY = b.y / PIXEL_SCALE;
@@ -129,7 +130,7 @@ void turretFire(int turn, int power) {
 			bulletExplode(screenX, screenY, 1);
 			field[screenX] = field[screenX] + 1;
 			printf("hit ground!\n");
-		}else if(screenX >= SCREEN_WIDTH - 1|| screenX <= 0){
+		} else if (screenX >= SCREEN_WIDTH - 1 || screenX <= 0) {
 			bullet_alive = 0;
 		}
 	} while (bullet_alive);
@@ -137,15 +138,15 @@ void turretFire(int turn, int power) {
 
 //Rotates the turret of given player by one unit clock wise
 void turretCW(int pNumber) {
-	if(p[pNumber].deg + 3 <= 120){
-	p[pNumber].deg = p[pNumber].deg + 3;
+	if (p[pNumber].deg + 3 <= 120) {
+		p[pNumber].deg = p[pNumber].deg + 3;
 	}
 }
 
 //Rotates the turret of given player by one unit counter clock wise
 void turretCCW(int pNumber) {
-	if(p[pNumber].deg - 3 >= 0){
-	p[pNumber].deg = p[pNumber].deg - 3;
+	if (p[pNumber].deg - 3 >= 0) {
+		p[pNumber].deg = p[pNumber].deg - 3;
 	}
 }
 
@@ -178,7 +179,7 @@ int getHitPlayer(int x, int y, int hitBoxLength) {
 }
 
 int getHitGround(int x, int y, int bulletType) {
-	if ((y >= field[x] - 1) && map[y][x]!=NOTHING) {
+	if ((y >= field[x] - 1) && map[y][x] != NOTHING) {
 		printf("hit ground!\n");
 		return 1;
 	}
@@ -186,7 +187,7 @@ int getHitGround(int x, int y, int bulletType) {
 }
 
 void bulletExplode(int x, int y, int bulletType) {
-	int r,j, i, colour, offset, pNumber;
+	int r, j, i, colour, offset, pNumber;
 	volatile int c = 2;
 	switch (bulletType) {
 	case 1:
@@ -194,31 +195,32 @@ void bulletExplode(int x, int y, int bulletType) {
 		colour = 0xF7FD;
 		//Remove pixels from the field
 		/*for (i = -r; i <= r; i++) {
-			offset = sqrt(r * r - i * i);
-			if (field[x + i] < y + offset) {
-				//printf("y;%i \t field[x+i]: %i \ty-field[x+i]:%i \t offset:%i\t min: %i",	y,field[x + i],y - field[x + i],offset,(((y - field[x + i]) < offset) ? (y - field[x + i]): offset));
-				field[x + i] = (y + offset - field[x + i] < 2 * offset) ? y + offset : field[x + i] + 2 * offset;
-				//printf("\t newfield[x]:%i \n", field[x + i]);
-			}
-		}*/
+		 offset = sqrt(r * r - i * i);
+		 if (field[x + i] < y + offset) {
+		 //printf("y;%i \t field[x+i]: %i \ty-field[x+i]:%i \t offset:%i\t min: %i",	y,field[x + i],y - field[x + i],offset,(((y - field[x + i]) < offset) ? (y - field[x + i]): offset));
+		 field[x + i] = (y + offset - field[x + i] < 2 * offset) ? y + offset : field[x + i] + 2 * offset;
+		 //printf("\t newfield[x]:%i \n", field[x + i]);
+		 }
+		 }*/
 		for (i = -r; i <= r; i++) {
 			offset = sqrt(r * r - i * i);
-			if( x + i >= 0 && x + i < SCREEN_WIDTH){
+			if (x + i >= 0 && x + i < SCREEN_WIDTH) {
 				for (j = -offset; j <= offset; j++) {
-					map[y+j][x+i] = NOTHING;
+					map[y + j][x + i] = NOTHING;
 				}
 			}
 		}
 		//See if player got hit
 		int hit;
-		for(pNumber = 0; pNumber < numPlayers; pNumber++){
-		//TODO: got thought alive players only
+		for (pNumber = 0; pNumber < numPlayers; pNumber++) {
+			//TODO: got thought alive players only
 			hit = 0;
-			for (i = -r; i <= r && hit==0; i++) {
+			for (i = -r; i <= r && hit == 0; i++) {
 				offset = sqrt(r * r - i * i);
-				if( x+i >= p[pNumber].x && x+i <= p[pNumber].x + TANK_LENGTH - 1){
-					for(j = y - offset; j <= y + offset && hit == 0; j++){
-						if(j > p[pNumber].y && j < p[pNumber].y + TANK_HEIGHT){
+				if (x + i >= p[pNumber].x && x + i <= p[pNumber].x
+						+ TANK_LENGTH - 1) {
+					for (j = y - offset; j <= y + offset && hit == 0; j++) {
+						if (j > p[pNumber].y && j < p[pNumber].y + TANK_HEIGHT) {
 							hit = 1;
 							printf("Explosion HIT");
 							break;
@@ -226,7 +228,7 @@ void bulletExplode(int x, int y, int bulletType) {
 					}
 				}
 			}
-			if (hit == 1){
+			if (hit == 1) {
 				p[pNumber].hp--;
 			}
 		}
@@ -235,36 +237,30 @@ void bulletExplode(int x, int y, int bulletType) {
 		//c is used for a delay and colour effect
 		for (c = 0; c < 25; c += 1) {
 			for (i = -r; i <= r; i++) {
-				printf("explosion: %i \n", x+i);
-				if( x + i >= 0 && x + i < SCREEN_WIDTH){
-				offset = sqrt(r * r - i * i);
-				updateExplosion(x + i, y, offset, colour + c);
+				printf("explosion: %i \n", x + i);
+				if (x + i >= 0 && x + i < SCREEN_WIDTH) {
+					offset = sqrt(r * r - i * i);
+					updateExplosion(x + i, y, offset, colour + c);
 				}
 			}
-		//TODO: cycle players alive
-		for (pNumber = 0; pNumber < numPlayers; ++pNumber) {
-			updatePlayer(i);
-		}
-		updateScreen();
 		}
 		break;
 	}
 }
 
 //checks and updates where the tank needs to fall
-void checkPlayerFalling(int pNumber){
+void checkPlayerFalling(int pNumber) {
 	int i;
 	int TankNotTouchGroundCounter = 0;
 
-	for ( i = p[pNumber].x; i < p[pNumber].x + TANK_LENGTH; i++){
-		if(map[p[pNumber].y + TANK_HEIGHT][i] == NOTHING){
+	for (i = p[pNumber].x; i < p[pNumber].x + TANK_LENGTH; i++) {
+		if (map[p[pNumber].y + TANK_HEIGHT][i] == NOTHING) {
 			TankNotTouchGroundCounter++;
 		}
 	}
 	//printf("TankNotTouchGroundCounter: %i\n", TankNotTouchGroundCounter);
-	if( TankNotTouchGroundCounter == TANK_LENGTH){
+	if (TankNotTouchGroundCounter == TANK_LENGTH) {
 		p[pNumber].y++;
 	}
 }
-
 

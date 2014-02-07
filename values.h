@@ -23,11 +23,19 @@
 #define RIGHT 1
 #define LEFT -1
 #define LEFT_ARROW 0x6b
+#define RIGHT_ARROW 0x74
+#define UP_ARROW 0x75
+#define DOWN_ARROW 0x72
+#define PAGE_UP 0x7d
+#define PAGE_DOWN 0x71
 #define SPACEBAR 0x29
+#define BACKSPACE 0x66
 
 typedef struct player{
 	int x;
 	int y;
+	int dx;
+	int dy;
 	int deg;
 	int hp;
 	int colour;

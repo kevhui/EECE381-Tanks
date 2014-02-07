@@ -64,12 +64,25 @@ void updateField() {
 
 //prints the prints a player to the screen
 void updatePlayer(int pNumber) {
-	// Draw a rectangle for the field
+	// Undraw the rectangle around the player
 	int i, j;
 	unsigned int addr;
+	int offset = 30;
 	int x = p[pNumber].x;
 	int y = p[pNumber].y;
 	int colour = p[pNumber].colour;
+
+	for (i = x - offset; i < x + TANK_LENGTH + offset; i++) {
+		for (j = y - offset; j < y + TANK_HEIGHT + offset; j++) {
+			addr = ((i & pixel_buffer->x_coord_mask) << 1);
+			addr += (((j & pixel_buffer -> y_coord_mask) * 320) << 1);
+			IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, map[j][i]);
+			//alt_up_pixel_buffer_dma_draw(pixel_buffer,hyrule[j][i],i,j);
+		}
+	}
+
+
+
 
 	//alt_up_pixel_buffer_dma_draw_rectangle(pixel_buffer, x, y, x + TANK_LENGTH-1,
 	//y + TANK_HEIGHT-1, colour, 1);
@@ -81,9 +94,9 @@ void updatePlayer(int pNumber) {
 				addr += ((((j + p[pNumber].y) & pixel_buffer -> y_coord_mask)
 						* 320) << 1);
 				if (p[pNumber].dir == RIGHT) {
-					IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, mario_right[j][i]);
+					IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, 0xAAAA);//mario_right[j][i]);
 				} else if (p[pNumber].dir == LEFT) {
-					IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, mario_left[j][i]);
+					IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, 0xAAAA);//mario_left[j][i]);
 				}
 			}
 		}
@@ -95,9 +108,9 @@ void updatePlayer(int pNumber) {
 				addr += ((((j + p[pNumber].y) & pixel_buffer -> y_coord_mask)
 						* 320) << 1);
 				if (p[pNumber].dir == RIGHT) {
-					IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, luigi_right[j][i]);
+					IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, 0x5454);//luigi_right[j][i]);
 				} else if (p[pNumber].dir == LEFT) {
-					IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, luigi_left[j][i]);
+					IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, 0x5454);//luigi_left[j][i]);
 				}
 			}
 		}
@@ -118,12 +131,29 @@ void updatePlayer(int pNumber) {
 //prints a bullet to the screen
 //TODO: make the bullet not one pixel
 void updateBullet(int x, int y) {
+	//only redraw the bullet
+	int i, j;
+	unsigned int addr;
+	int offset = 10;
+
+	for (i = x - offset; i < x + offset; i++) {
+		for (j = y - offset; j < y + offset; j++) {
+			addr = ((i & pixel_buffer->x_coord_mask) << 1);
+			addr += (((j & pixel_buffer -> y_coord_mask) * 320) << 1);
+			IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, map[j][i]);
+			//alt_up_pixel_buffer_dma_draw(pixel_buffer,hyrule[j][i],i,j);
+		}
+	}
+	//must redraw player to compensate for blackbox of bullet
+	for (i = 0; i < numPlayers; ++i) {
+	updatePlayer(i);
+	}
+
 	alt_up_pixel_buffer_dma_draw(pixel_buffer, 0xFFFF, x, y);
 }
 
 //draws a circle as an explosion
 void updateExplosion(int x, int y, int offset, int colour) {
-	//The first two draw lines is to clean up the circle
 	alt_up_pixel_buffer_dma_draw_line(pixel_buffer, x, y + offset, x,
 			y - offset, colour, 1);
 }
@@ -209,6 +239,7 @@ void printHp(int pNumber) {
 	}
 }
 
+/*
 void drawTest() {
 	int i, j;
 	for (j = 0; j < HYRULE_HEIGHT; j++) {
@@ -218,6 +249,7 @@ void drawTest() {
 	}
 
 }
+*/
 
 void clearCharBuffer() {
 	alt_up_char_buffer_clear(char_buffer);

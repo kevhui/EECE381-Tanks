@@ -18,7 +18,7 @@
 #include "values.h"
 #include "player.h"
 #include "field.h"
-#include "images.h"
+//#include "images.h"
 
 void initScreen(void);
 void initCharBuffer(void);
