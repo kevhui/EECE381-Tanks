@@ -22,6 +22,7 @@
 #include "player.h"
 #include "menu.h"
 
+
 static void initKeyboard();//initializes keyboard
 void runGame();
 
@@ -168,8 +169,20 @@ int main(void) {
 
 		initField();
 		updateField();
+		drawName(p[pOne].name,p[pTwo].name,p[pThree].name,p[pFour].name);
+		//drawGas(p[pOne].gas,p[pTwo].gas,p[pThree].gas,p[pFour].gas);
+		drawHealth(p[pOne].hp,p[pTwo].hp,p[pThree].hp,p[pFour].hp);
+		//drawBullet(0);
+		//drawWindIndicator(1);
 		updateScreen();
 		updateField();
+		drawName(p[pOne].name,p[pTwo].name,p[pThree].name,p[pFour].name);
+		//drawGas(p[pOne].gas,p[pTwo].gas,p[pThree].gas,p[pFour].gas);
+		drawHealth(p[pOne].hp,p[pTwo].hp,p[pThree].hp,p[pFour].hp);
+		//drawBullet(0);
+		//drawWindIndicator(1);
+		updateScreen();
+
 
 		while (state == 2) {
 			runGame();
@@ -234,6 +247,12 @@ void runGame(void) {
 		alt_up_ps2_clear_fifo(ps2);
 		printf("Fifo cleared\n");
 		fFire = 0;
+		//drawGas(p[pOne].gas,p[pTwo].gas,p[pThree].gas,p[pFour].gas);
+		drawHealth(p[pOne].hp,p[pTwo].hp,p[pThree].hp,p[pFour].hp);
+		//drawBullet(0);
+		//drawWindIndicator(1);
+		updateScreen();
+		drawHealth(p[pOne].hp,p[pTwo].hp,p[pThree].hp,p[pFour].hp);
 	}
 
 	//printf("degree: %d \n",p[turn].deg);

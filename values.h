@@ -36,8 +36,10 @@
 #define LUIGI 1
 #define COMPUTER 0
 #define HUMAN 1
+#define SCREEN_CHARACTER_WIDTH 80
+#define SCREEN_CHARACTER_HEIGHT 60
 
-typedef struct player{
+typedef struct player {
 	int x;
 	int y;
 	int dx;
@@ -54,11 +56,15 @@ typedef struct player{
 	int type;
 } player;
 
-struct bullet{
+struct bullet {
 	int x;
 	int y;
 	int dx;
 	int dy;
 };
 
+enum bulletType {
+	regular,
+	splits
+};
 #endif

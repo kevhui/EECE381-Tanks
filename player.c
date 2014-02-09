@@ -9,24 +9,32 @@
 
 void initPlayer(int id, int character, char *name, int type) {
 	switch (id) {
-		case pOne:
-			p[id].x = 50;
-			p[id].y = SCREEN_HEIGHT/2;
-			break;
-		case pTwo:
-			p[id].x = SCREEN_WIDTH * 3 / 4;
-			p[id].y = SCREEN_HEIGHT/2;
-			break;
+	case pOne:
+		p[id].x = 50;
+		p[id].y = SCREEN_HEIGHT / 2;
+		break;
+	case pTwo:
+		p[id].x = SCREEN_WIDTH * 3 / 4;
+		p[id].y = SCREEN_HEIGHT / 2;
+		break;
+	case pThree:
+		p[id].x = 150;
+		p[id].y = SCREEN_HEIGHT / 2;
+		break;
+	case pFour:
+		p[id].x = 200;
+		p[id].y = SCREEN_HEIGHT / 2;
+		break;
 	}
 
 	printf("init player %i with character %i", id, character);
 	switch (character) {
-		case MARIO:
-			p[id].colour = 0x4800;
-			break;
-		case LUIGI:
-			p[id].colour = 0x4648;
-			break;
+	case MARIO:
+		p[id].colour = 0x4800;
+		break;
+	case LUIGI:
+		p[id].colour = 0x4648;
+		break;
 	}
 
 	//these can be fixed
@@ -40,10 +48,8 @@ void initPlayer(int id, int character, char *name, int type) {
 
 	//TODO:these should be adjustable
 	//TODO: more than 3 hp start
-	p[id].hp = 3; //game options
+	p[id].hp = 100; //game options
 	p[id].gas = 100; //gas
-
-
 
 
 }
@@ -109,8 +115,6 @@ void moveRight(int id) {
 	}
 }
 
-//TODO: bullet should have a hit radius of 1-2 pixels
-//TODO: bullets need to explode
 //Fires the bullet and checks for collision and updates field array accordingly
 void turretFire(int turn, int power) {
 	struct bullet b;
@@ -157,7 +161,8 @@ void turretFire(int turn, int power) {
 			bulletExplode(screenX, screenY, 1);
 			field[screenX] = field[screenX] + 1;
 			printf("hit ground!\n");
-		} else if (screenX >= SCREEN_WIDTH - 1 || screenX <= 0 || screenY >= SCREEN_HEIGHT - 1) {
+		} else if (screenX >= SCREEN_WIDTH - 1 || screenX <= 0 || screenY
+				>= SCREEN_HEIGHT - 1) {
 			bullet_alive = 0;
 		}
 	} while (bullet_alive);
@@ -206,15 +211,20 @@ int getHitPlayer(int x, int y, int hitBoxLength) {
 }
 
 int getHitGround(int x, int y, int bulletType) {
-	if ((y >= field[x] - 1) && map[y][x] != NOTHING) {
-		printf("hit ground!\n");
-		return 1;
+	int i, j;
+	for (j = -1; j <= 1; j++) {
+		for (i = -1; i <= 1; ++i) {
+			if (map[y + j][x + i] != NOTHING) {
+				printf("hit ground!\n");
+				return 1;
+			}
+		}
 	}
 	return 0;
 }
 
 void bulletExplode(int x, int y, int bulletType) {
-	int r, j, i, colour, offset, id;
+	int r, j, i, colour, offset, id, hit;
 	volatile int c = 2;
 	switch (bulletType) {
 	case 1:
@@ -238,14 +248,12 @@ void bulletExplode(int x, int y, int bulletType) {
 			}
 		}
 		//See if player got hit
-		int hit;
 		for (id = 0; id < numPlayers; id++) {
 			//TODO: got thought alive players only
 			hit = 0;
 			for (i = -r; i <= r && hit == 0; i++) {
 				offset = sqrt(r * r - i * i);
-				if (x + i >= p[id].x && x + i <= p[id].x
-						+ TANK_LENGTH - 1) {
+				if (x + i >= p[id].x && x + i <= p[id].x + TANK_LENGTH - 1) {
 					for (j = y - offset; j <= y + offset && hit == 0; j++) {
 						if (j > p[id].y && j < p[id].y + TANK_HEIGHT) {
 							hit = 1;
@@ -256,7 +264,7 @@ void bulletExplode(int x, int y, int bulletType) {
 				}
 			}
 			if (hit == 1) {
-				p[id].hp--;
+				p[id].hp-=25;
 			}
 		}
 
@@ -268,10 +276,10 @@ void bulletExplode(int x, int y, int bulletType) {
 				//printf("explosion: %i \n", x + i);
 				if (x + i >= 0 && x + i < SCREEN_WIDTH) {
 					offset = sqrt(r * r - i * i);
-					if (c >= delay-1){
-					updateExplosion(x + i, y, offset,NOTHING);
-					}else{
-					updateExplosion(x + i, y, offset,colour+c);
+					if (c >= delay - 1) {
+						updateExplosion(x + i, y, offset, NOTHING);
+					} else {
+						updateExplosion(x + i, y, offset, colour + c);
 					}
 				}
 			}

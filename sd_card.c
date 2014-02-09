@@ -7,7 +7,7 @@
 
 #include "sd_card.h"
 
-void printSD(){
+void printSD() {
 	alt_up_sd_card_dev *device_reference = NULL;
 	int connected = 0;
 	char* fileName;
@@ -16,15 +16,15 @@ void printSD(){
 		while (1) {
 			if ((connected == 0) && (alt_up_sd_card_is_Present())) {
 				printf("Card connected. \n");
-				printf("fat16: %d",alt_up_sd_card_is_FAT16());
+				printf("fat16: %d", alt_up_sd_card_is_FAT16());
 				if (alt_up_sd_card_is_FAT16()) {
 					printf("FAT16 file system detected. \n");
 
-					if(alt_up_sd_card_find_first("",fileName)==0){
+					if (alt_up_sd_card_find_first("", fileName) == 0) {
 						printf("Files detected: \n");
-						do{
-							printf("%s \n",fileName);
-						}while(alt_up_sd_card_find_next(fileName)==0);
+						do {
+							printf("%s \n", fileName);
+						} while (alt_up_sd_card_find_next(fileName) == 0);
 					}
 				} else {
 					printf("Unknown file system. \n");

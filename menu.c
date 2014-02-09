@@ -44,9 +44,9 @@ void initState1(int id) {
 	else if (id == pTwo)
 		printString("2", 42, 14);
 	else if (id == pThree)
-		printString("1", 42, 14);
+		printString("3", 42, 14);
 	else if (id == pFour)
-		printString("1", 42, 14);
+		printString("4", 42, 14);
 	printString("ENTER NAME: ", 14, 20);
 	printString("CHANGE COLOR: ", 14, 24);
 	printString("MARIO", 28, 24);//default

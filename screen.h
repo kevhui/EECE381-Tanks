@@ -19,6 +19,7 @@
 #include "player.h"
 #include "field.h"
 #include "images.h"
+#include "images_bars.h"
 
 void initScreen(void); //Initialise screen
 void initCharBuffer(void); //Initialise char buffer
@@ -27,13 +28,22 @@ void updateScreen(void); //Swaps buffers
 void undrawPlayers(void); //updates the players
 void updateField(void); //updates the field
 void updatePlayer(int); //updates the players
-void updateBullet(int,int); //updates the bullet
-void updateExplosion(int,int,int,int); //update the explosion
+void updateBullet(int, int); //updates the bullet
+void updateExplosion(int, int, int, int); //update the explosion
 void printLines(void); //draw lines
-void printString(char*,int,int); //print string
+void printString(char*, int, int); //print string
 void printHp(int); //print hp TODO:// change this to draw UI
 void drawTest(void); //testing drawing
 void clearCharBuffer(void); //clear char buffer
-void fastPixel(int,int,int); //draws a single pixel to screen
+void fastPixel(int, int, int); //draws a single pixel to screen
+void drawName(char*,char*,char*,char*);
+void drawTest(void);
+void drawHealth(int,int,int,int);
+void drawGas(int,int,int,int);
+//void drawBullet(int);
+//void drawWindIndicator(int);
+
+void displayHighScore(char *,char *,char *,char *);
+
 
 #endif

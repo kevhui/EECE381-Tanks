@@ -24,7 +24,7 @@ void clean_up(void);//clean up game variables etc. (reset basically)
 void clearPlayerName(void);//clears all player names
 void printPlayerStruct(int);//test for player struct
 void updateNumPlayers(); //updates the number of players for screen0
-void state_0(int,alt_8);//state_0 logic
-void state_1(int,alt_8,char);//state_0 logic
+void state_0(int, alt_8);//state_0 logic
+void state_1(int, alt_8, char);//state_0 logic
 
 #endif /* MENU_H_ */

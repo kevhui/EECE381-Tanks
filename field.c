@@ -17,24 +17,23 @@ void initField() {
 //TODO: Make a field generator
 //Generates a field
 void generateField() {
-	int i,j,flag;
+	int i, j, flag;
 
-	for(i = 0; i < SCREEN_WIDTH ; i++){
+	for (i = 0; i < SCREEN_WIDTH; i++) {
 		flag = 0;
-		for(j = 0; j < SCREEN_HEIGHT ; j++){
+		for (j = 0; j < SCREEN_HEIGHT; j++) {
 			//Using white as a mask
 			//if (flag == 1){
-			if( j > SCREEN_HEIGHT * 7 /10){
+			if (j > SCREEN_HEIGHT * 7 / 10) {
 				map[j][i] = 0xFFFF;//hyrule[j][i];
+			} else {
+				map[j][i] = NOTHING;
 			}
-			else{
-			map[j][i] = NOTHING;
-			}
-/*			if (hyrule[j][i] != 0xFFFF && flag == 0){
-				field[i] = j-2;
-				map[j-1][i] = NOTHING;
-				flag = 1;
-			}*/
+			/*			if (hyrule[j][i] != 0xFFFF && flag == 0){
+			 field[i] = j-2;
+			 map[j-1][i] = NOTHING;
+			 flag = 1;
+			 }*/
 
 		}
 	}
@@ -48,6 +47,4 @@ void printField() {
 		printf("%i", field[i]);
 	}
 }
-
-
 

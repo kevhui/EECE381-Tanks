@@ -256,3 +256,135 @@ void fastPixel(int x, int y, int colour) {
 	addr += (((y & pixel_buffer -> y_coord_mask) * 320) << 1);
 	IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, colour);
 }
+
+void drawName(char* name1, char* name2, char* name3, char* name4) {
+	if (numPlayers == 2) {
+		alt_up_char_buffer_string(char_buffer, name1, 6, 0);
+		alt_up_char_buffer_string(char_buffer, name2, 48, 0);
+	} else if (numPlayers == 3) {
+		alt_up_char_buffer_string(char_buffer, name1, 6, 0);
+		alt_up_char_buffer_string(char_buffer, name2, 24, 0);
+		alt_up_char_buffer_string(char_buffer, name3, 48, 0);
+	} else {
+		alt_up_char_buffer_string(char_buffer, name1, 6, 0);
+		alt_up_char_buffer_string(char_buffer, name2, 24, 0);
+		alt_up_char_buffer_string(char_buffer, name3, 48, 0);
+		alt_up_char_buffer_string(char_buffer, name4, 66, 0);
+	}
+}
+
+
+// 0<= power <= 100
+void drawHealth(int health1, int health2, int health3, int health4) {
+	int i, j, x_start, x_coordinate, y_coordinate;
+	int count = 0;
+	int percentage;
+	int health;
+
+	// Test Image
+	for (j = 0; j < CHARACTER_MARIO_HEIGHT; j++) {
+		for (i = 0; i < CHARACTER_MARIO_WIDTH; i++) {
+			alt_up_pixel_buffer_dma_draw(pixel_buffer, 0xffff, i, j);
+		}
+	}
+
+	while (count < numPlayers) {
+		if (count == 0) {
+			health = health1;
+			x_start = CHARACTER_MARIO_WIDTH;
+		} else {
+			if (numPlayers == 2) {
+				health = health2;
+				x_start = (CHARACTER_MARIO_WIDTH + HEALTH_BAR_WIDTH) * 2
+						+ WIND_WIDTH;
+			} else if (numPlayers == 3) {
+				if (count == 1) {
+					health = health2;
+					x_start = CHARACTER_MARIO_WIDTH + HEALTH_BAR_WIDTH
+							+ CHARACTER_MARIO_WIDTH;
+				} else if (count == 2) {
+					health = health3;
+					x_start = (CHARACTER_MARIO_WIDTH + HEALTH_BAR_WIDTH) * 2
+							+ WIND_WIDTH;
+				}
+			} else {
+				if (count == 1) {
+					health = health2;
+					x_start = CHARACTER_MARIO_WIDTH + HEALTH_BAR_WIDTH
+							+ CHARACTER_MARIO_WIDTH;
+
+					// Test Image
+					for (j = 0; j < CHARACTER_MARIO_HEIGHT; j++) {
+						for (i = 0, x_coordinate = (CHARACTER_MARIO_WIDTH
+								+ HEALTH_BAR_WIDTH); i < CHARACTER_MARIO_WIDTH; i++, x_coordinate++) {
+							alt_up_pixel_buffer_dma_draw(pixel_buffer, 0x7e0,
+									x_coordinate, j);
+						}
+					}
+
+				} else if (count == 2) {
+					// Test Image
+					for (j = 0; j < CHARACTER_MARIO_HEIGHT; j++) {
+						for (i = 0, x_coordinate = (CHARACTER_MARIO_WIDTH
+								+ HEALTH_BAR_WIDTH) * 2 + BULLET_BORDER_WIDTH; i
+								< CHARACTER_MARIO_WIDTH; i++, x_coordinate++) {
+							alt_up_pixel_buffer_dma_draw(pixel_buffer, 0xF800,
+									x_coordinate, j);
+						}
+					}
+
+					health = health3;
+					x_start = (CHARACTER_MARIO_WIDTH + HEALTH_BAR_WIDTH) * 2
+							+ CHARACTER_MARIO_WIDTH + WIND_WIDTH;
+				} else {
+					health = health4;
+					x_start = (CHARACTER_MARIO_WIDTH + HEALTH_BAR_WIDTH) * 3
+							+ CHARACTER_MARIO_WIDTH + WIND_WIDTH;
+
+					// Test Image
+					for (j = 0; j < CHARACTER_MARIO_HEIGHT; j++) {
+						for (i = 0, x_coordinate = (CHARACTER_MARIO_WIDTH
+								+ HEALTH_BAR_WIDTH) * 3 + BULLET_BORDER_WIDTH; i
+								< CHARACTER_MARIO_WIDTH; i++, x_coordinate++) {
+							alt_up_pixel_buffer_dma_draw(pixel_buffer, 0x1f,
+									x_coordinate, j);
+						}
+					}
+
+				}
+			}
+		}
+		x_coordinate = x_start;
+		y_coordinate = NAME_HEIGHT;
+
+		percentage = (HEALTH_X_GREEN_END - HEALTH_X_GREEN_START) * health / 100;
+		for (j = 0; j < HEALTH_BAR_HEIGHT; j++, y_coordinate++) {
+			// y_coordinate in the green region
+			if ((j >= HEALTH_Y_GREEN_START) && (j <= HEALTH_Y_GREEN_END)) {
+				// Before the grey area
+				for (i = 0, x_coordinate = x_start; i <= HEALTH_Y_GREEN_START
+						+ percentage; i++, x_coordinate++) {
+					alt_up_pixel_buffer_dma_draw(pixel_buffer,
+							health_bar[j][i], x_coordinate, y_coordinate);
+				}
+				// Grey area - After the percentage, before the border
+				for (; i <= HEALTH_X_GREEN_END; i++, x_coordinate++) {
+					alt_up_pixel_buffer_dma_draw(pixel_buffer, 0x7BEF,
+							x_coordinate, y_coordinate);
+				}
+				// After the grey area, Start the border again
+				for (; i < HEALTH_BAR_WIDTH; i++, x_coordinate++) {
+					alt_up_pixel_buffer_dma_draw(pixel_buffer,
+							health_bar[j][i], x_coordinate, y_coordinate);
+				}
+			} else {
+				for (i = 0, x_coordinate = x_start; i < HEALTH_BAR_WIDTH; i++, x_coordinate++) {
+					alt_up_pixel_buffer_dma_draw(pixel_buffer,
+							health_bar[j][i], x_coordinate, y_coordinate);
+				}
+			}
+		}
+		count++;
+	}
+}
+
