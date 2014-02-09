@@ -63,68 +63,45 @@ void updateField() {
 }
 
 //prints the prints a player to the screen
-void updatePlayer(int pNumber) {
-	// Undraw the rectangle around the player
+void updatePlayer(int id) {
 	int i, j;
-	unsigned int addr;
-	int offset = 30;
-	int x = p[pNumber].x;
-	int y = p[pNumber].y;
-	int colour = p[pNumber].colour;
-
-	for (i = x - offset; i < x + TANK_LENGTH + offset; i++) {
-		for (j = y - offset; j < y + TANK_HEIGHT + offset; j++) {
-			addr = ((i & pixel_buffer->x_coord_mask) << 1);
-			addr += (((j & pixel_buffer -> y_coord_mask) * 320) << 1);
-			IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, map[j][i]);
-			//alt_up_pixel_buffer_dma_draw(pixel_buffer,hyrule[j][i],i,j);
-		}
-	}
-
-
-
+	int x = p[id].x;
+	int y = p[id].y;
 
 	//alt_up_pixel_buffer_dma_draw_rectangle(pixel_buffer, x, y, x + TANK_LENGTH-1,
 	//y + TANK_HEIGHT-1, colour, 1);
-	switch (pNumber) {
-	case pOne:
+	switch (p[id].character) {
+	case MARIO:
 		for (i = 0; i < TANK_LENGTH; i++) {
 			for (j = 0; j < TANK_HEIGHT; j++) {
-				addr = (((i + p[pNumber].x) & pixel_buffer->x_coord_mask) << 1);
-				addr += ((((j + p[pNumber].y) & pixel_buffer -> y_coord_mask)
-						* 320) << 1);
-				if (p[pNumber].dir == RIGHT) {
-					IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, 0xAAAA);//mario_right[j][i]);
-				} else if (p[pNumber].dir == LEFT) {
-					IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, 0xAAAA);//mario_left[j][i]);
-				}
+				if (p[id].dir == RIGHT && mario_right[j][i] != MASK)
+					fastPixel(x + i, y + j, mario_right[j][i]);
+				else if (p[id].dir == LEFT && mario_left[j][i] != MASK)
+					fastPixel(x + i, y + j, mario_left[j][i]);
 			}
 		}
 		break;
-	case pTwo:
+	case LUIGI:
 		for (i = 0; i < TANK_LENGTH; i++) {
 			for (j = 0; j < TANK_HEIGHT; j++) {
-				addr = (((i + p[pNumber].x) & pixel_buffer->x_coord_mask) << 1);
-				addr += ((((j + p[pNumber].y) & pixel_buffer -> y_coord_mask)
-						* 320) << 1);
-				if (p[pNumber].dir == RIGHT) {
-					IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, 0x5454);//luigi_right[j][i]);
-				} else if (p[pNumber].dir == LEFT) {
-					IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, 0x5454);//luigi_left[j][i]);
-				}
+				if (p[id].dir == RIGHT && luigi_right[j][i] != MASK)
+					fastPixel(x + i, y + j, luigi_right[j][i]);
+				else if (p[id].dir == LEFT && luigi_left[j][i] != MASK)
+					fastPixel(x + i, y + j, luigi_left[j][i]);
 			}
 		}
 		break;
 	}
-	if (turn == pNumber) {
-		int deg = p[pNumber].deg * p[pNumber].dir;
+	if (turn == id) {
+		int deg = p[id].deg * p[id].dir;
 		int t_startX = x + TANK_LENGTH / 2 + getTurretWidth(deg) * 2 / 3;
 		int t_startY = y + TANK_HEIGHT / 2 - getTurretHeight(deg) * 2 / 3;
 		int t_endX = x + TANK_LENGTH / 2 + getTurretWidth(deg);
 		int t_endY = y + TANK_HEIGHT / 2 - getTurretHeight(deg);
 
+		//TODO: switch case the character and choose appropriate colour
 		alt_up_pixel_buffer_dma_draw_line(pixel_buffer, t_startX, t_startY,
-				t_endX, t_endY, colour, 1);
+				t_endX, t_endY, p[turn].colour, 1);
 	}
 }
 
@@ -146,7 +123,7 @@ void updateBullet(int x, int y) {
 	}
 	//must redraw player to compensate for blackbox of bullet
 	for (i = 0; i < numPlayers; ++i) {
-	updatePlayer(i);
+		updatePlayer(i);
 	}
 
 	alt_up_pixel_buffer_dma_draw(pixel_buffer, 0xFFFF, x, y);
@@ -192,18 +169,18 @@ void printString(char *out_string, int x, int y) {
 
 //Prints string
 //TODO: MAKE THIS BETTER
-void printHp(int pNumber) {
+void printHp(int id) {
 	alt_up_char_buffer_string(char_buffer, p[pOne].name, 10, 10);
 	alt_up_char_buffer_string(char_buffer, p[pTwo].name, 50, 10);
 	/*if (p[pOne].colour==1)alt_up_char_buffer_string(char_buffer, "BLUE", 10, 14);
-	else if (p[pOne].colour==0) alt_up_char_buffer_string(char_buffer, "PINK", 10, 14);
-	if (p[pTwo].colour==1)alt_up_char_buffer_string(char_buffer, "BLUE", 50, 14);
-	else if (p[pTwo].colour==0) alt_up_char_buffer_string(char_buffer,"PINK", 50, 14);
-	if (p[pOne].type==1)alt_up_char_buffer_string(char_buffer, "REAL", 10, 18);
-	else if (p[pOne].type==0) alt_up_char_buffer_string(char_buffer, "COMP", 10, 18);
-	if (p[pTwo].type==1)alt_up_char_buffer_string(char_buffer, "REAL", 50, 18);
-	else if (p[pTwo].type==0) alt_up_char_buffer_string(char_buffer, "COMP", 50, 18);
-*/
+	 else if (p[pOne].colour==0) alt_up_char_buffer_string(char_buffer, "PINK", 10, 14);
+	 if (p[pTwo].colour==1)alt_up_char_buffer_string(char_buffer, "BLUE", 50, 14);
+	 else if (p[pTwo].colour==0) alt_up_char_buffer_string(char_buffer,"PINK", 50, 14);
+	 if (p[pOne].type==1)alt_up_char_buffer_string(char_buffer, "REAL", 10, 18);
+	 else if (p[pOne].type==0) alt_up_char_buffer_string(char_buffer, "COMP", 10, 18);
+	 if (p[pTwo].type==1)alt_up_char_buffer_string(char_buffer, "REAL", 50, 18);
+	 else if (p[pTwo].type==0) alt_up_char_buffer_string(char_buffer, "COMP", 50, 18);
+	 */
 
 	if (p[pTwo].hp == 0) {
 		alt_up_char_buffer_string(char_buffer, ": WINS!", 20, 10);
@@ -211,9 +188,9 @@ void printHp(int pNumber) {
 	} else if (p[pOne].hp == 0) {
 		alt_up_char_buffer_string(char_buffer, ": X___X", 20, 10);
 		alt_up_char_buffer_string(char_buffer, ": WINS!", 60, 10);
-	} else if (pNumber == pOne) {
+	} else if (id == pOne) {
 
-		switch (p[pNumber].hp) {
+		switch (p[pOne].hp) {
 		case 1:
 			alt_up_char_buffer_string(char_buffer, ": 1HP", 20, 10);
 			break;
@@ -224,8 +201,8 @@ void printHp(int pNumber) {
 			alt_up_char_buffer_string(char_buffer, ": 3HP", 20, 10);
 			break;
 		}
-	} else if (pNumber == pTwo) {
-		switch (p[pNumber].hp) {
+	} else if (id == pTwo) {
+		switch (p[pTwo].hp) {
 		case 1:
 			alt_up_char_buffer_string(char_buffer, ": 1HP", 60, 10);
 			break;
@@ -240,18 +217,42 @@ void printHp(int pNumber) {
 }
 
 /*
-void drawTest() {
-	int i, j;
-	for (j = 0; j < HYRULE_HEIGHT; j++) {
-		for (i = 0; i < HYRULE_WIDTH; i++) {
-			alt_up_pixel_buffer_dma_draw(pixel_buffer, hyrule[j][i], i, j);
-		}
-	}
+ void drawTest() {
+ int i, j;
+ for (j = 0; j < HYRULE_HEIGHT; j++) {
+ for (i = 0; i < HYRULE_WIDTH; i++) {
+ alt_up_pixel_buffer_dma_draw(pixel_buffer, hyrule[j][i], i, j);
+ }
+ }
 
-}
-*/
+ }
+ */
 
 void clearCharBuffer() {
 	alt_up_char_buffer_clear(char_buffer);
 }
 
+void undrawPlayers() {
+	int id, i, j, x, y, character;
+	int offset = 16;
+	//TODO:change to cycle only alive players
+	for (id = 0; id < numPlayers; ++id) {
+		x = p[id].x;
+		y = p[id].y;
+
+		character = p[id].character;
+		for (j = -offset; j < TANK_HEIGHT + offset; j++) {
+			for (i = -offset; i < TANK_LENGTH + offset; i++) {
+				fastPixel(x + i, y + j, map[y + j][x + i]);
+			}
+		}
+
+	}
+}
+
+void fastPixel(int x, int y, int colour) {
+	unsigned int addr;
+	addr = ((x & pixel_buffer->x_coord_mask) << 1);
+	addr += (((y & pixel_buffer -> y_coord_mask) * 320) << 1);
+	IOWR_16DIRECT(pixel_buffer->back_buffer_start_address,addr, colour);
+}

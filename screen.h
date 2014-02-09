@@ -18,21 +18,22 @@
 #include "values.h"
 #include "player.h"
 #include "field.h"
-//#include "images.h"
+#include "images.h"
 
-void initScreen(void);
-void initCharBuffer(void);
-void clearScreen(void);
-void updateScreen(void);
-void drawField(void);
-void updateField(void);
-void updatePlayer(int);
-void updateBullet(int,int);
-void updateExplosion(int,int,int,int);
-void printLines(void);
-void printString(char*,int,int);
-void printHp(int);
-void drawTest(void);
-void clearCharBuffer(void);
+void initScreen(void); //Initialise screen
+void initCharBuffer(void); //Initialise char buffer
+void clearScreen(void); //Clears screen
+void updateScreen(void); //Swaps buffers
+void undrawPlayers(void); //updates the players
+void updateField(void); //updates the field
+void updatePlayer(int); //updates the players
+void updateBullet(int,int); //updates the bullet
+void updateExplosion(int,int,int,int); //update the explosion
+void printLines(void); //draw lines
+void printString(char*,int,int); //print string
+void printHp(int); //print hp TODO:// change this to draw UI
+void drawTest(void); //testing drawing
+void clearCharBuffer(void); //clear char buffer
+void fastPixel(int,int,int); //draws a single pixel to screen
 
 #endif

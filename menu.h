@@ -22,7 +22,6 @@ void AdjustChar();//change character on screen
 void Name_Entered(char *);//player name entered handler
 void clean_up(void);//clean up game variables etc. (reset basically)
 void clearPlayerName(void);//clears all player names
-void initPlayer(int, int, char *, int);//initialize player struct
 void printPlayerStruct(int);//test for player struct
 void updateNumPlayers(); //updates the number of players for screen0
 void state_0(int,alt_8);//state_0 logic

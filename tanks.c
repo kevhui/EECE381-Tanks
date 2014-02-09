@@ -23,7 +23,7 @@
 #include "menu.h"
 
 static void initKeyboard();//initializes keyboard
-
+void runGame();
 
 struct player p[3];
 int field[SCREEN_WIDTH];
@@ -130,28 +130,32 @@ void initKeyboard() {
 }
 
 int main(void) {
-	int i;
 	while (1) {
 		numPlayers = 2;
 		initScreen();
 		clearScreen();
 		initCharBuffer();
-		//decode_scancode(ps2, &decode_mode, buf, &ascii);
-
 		clean_up();
 		initKeyboard();
-		initField();
 		initState0();
-		while (state == 0) {
-			decode_scancode(ps2, &decode_mode, buf, &ascii);
-			state_0(decode_mode, buf[0]);
-		};
 
-		initState1(1);
-		while (state == 1) {
-			decode_scancode(ps2, &decode_mode, buf, &ascii);
-			state_1(decode_mode, buf[0], ascii);
-		};
+		//This is for Isaac cause he doesnt have a keyboard
+		if (IORD(keys,0) == 8) {
+			initPlayer(pOne, MARIO, "pOne", HUMAN);
+			initPlayer(pTwo, LUIGI, "pTwo", HUMAN);
+			state = 2;
+		} else {
+			while (state == 0) {
+				decode_scancode(ps2, &decode_mode, buf, &ascii);
+				state_0(decode_mode, buf[0]);
+			};
+
+			initState1(pOne);
+			while (state == 1) {
+				decode_scancode(ps2, &decode_mode, buf, &ascii);
+				state_1(decode_mode, buf[0], ascii);
+			};
+		}
 
 		//clean_up();
 		clearCharBuffer();
@@ -162,91 +166,15 @@ int main(void) {
 				keyboard_ISR);
 		alt_up_ps2_enable_read_interrupt(ps2);
 
-		kevininitPlayer(pOne, 50, SCREEN_HEIGHT * 7 / 10 - TANK_HEIGHT - 1, 90,
-				3, 0x4800, 0, 1, 100, RIGHT, p[1].name);
-		kevininitPlayer(pTwo, SCREEN_WIDTH * 3 / 4,
-				SCREEN_HEIGHT * 7 / 10 - TANK_HEIGHT - 1, 90, 3, 0x4648, 0, 1,
-				100, LEFT, p[2].name);
-
-		clearScreen();
+		initField();
 		updateField();
 		updateScreen();
 		updateField();
-		updateScreen();
 
 		while (state == 2) {
-			if (IORD(keys,0) == 8) {
-				moveLeft(turn);
-			}
-			//moves right
-			if (IORD(keys,0) == 4) {
-				moveRight(turn);
-			}
-			//turret fire
-			if (IORD(keys,0) == 2) {
-				//fire power should be 0<power<100
-				turretFire(turn, 100); //need to get power from keyboard
-
-				//TODO: skip players that are dead
-				turn = (turn + 1) % numPlayers;
-
-			}
-			//turret CW
-			if (IORD(switches,0) == 1) {
-				turretCW(turn);
-			}
-			//turret CCW
-			if (IORD(switches,0) == 2) {
-				turretCCW(turn);
-			}
-			if (IORD(switches,0) == 4) {
-				p[pOne].hp = 0;
-			}
-
-			if (fLeft == 1) {
-				moveLeft(turn);
-			}
-			if (fRight == 1) {
-				moveRight(turn);
-			}
-			if (fUp == 1) {
-				turretCCW(turn);
-			}
-			if (fDown == 1) {
-				turretCW(turn);
-			}
-			if (fFire == 1) {
-				turretFire(turn, 100);
-				turn = (turn + 1) % numPlayers;
-				fFire = 0;
-				/*				updateScreen();
-				 clearScreen();
-				 updateField();*/
-				//clearScreen();
-				//updateField();
-			}
-
-			//printf("degree: %d \n",p[turn].deg);
-
-			//clearScreen();
-			//updateField();
-
-
-			for (i = 0; i < numPlayers; ++i) {
-				checkPlayerFalling(i);
-				updatePlayer(i);
-				printHp(i);
-			}
-			//drawTest();
-			updateScreen();
-			usleep(5000);
-
-			if (p[pOne].hp == 0 || p[pTwo].hp == 0) {
-				usleep(1000000);
-				state = 3;
-			}
+			runGame();
 		}
-
+		alt_up_ps2_disable_read_interrupt(ps2);
 		WinScreenTest();
 		while (state == 3)
 			;
@@ -254,3 +182,88 @@ int main(void) {
 	}
 }
 
+void runGame(void) {
+	undrawPlayers();
+	int i;
+	if (IORD(keys,0) == 8) {
+		moveLeft(turn);
+	}
+	//moves right
+	if (IORD(keys,0) == 4) {
+		moveRight(turn);
+	}
+	//turret fire
+	if (IORD(keys,0) == 2) {
+		//fire power should be 0<power<100
+		turretFire(turn, 100); //need to get power from keyboard
+
+		//TODO: skip players that are dead
+		turn = (turn + 1) % numPlayers;
+
+	}
+	//turret CW
+	if (IORD(switches,0) == 1) {
+		turretCW(turn);
+	}
+	//turret CCW
+	if (IORD(switches,0) == 2) {
+		turretCCW(turn);
+	}
+	if (IORD(switches,0) == 4) {
+		p[pOne].hp = 0;
+	}
+
+	if (fLeft == 1) {
+		moveLeft(turn);
+	}
+	if (fRight == 1) {
+		moveRight(turn);
+	}
+	if (fUp == 1) {
+		turretCCW(turn);
+	}
+	if (fDown == 1) {
+		turretCW(turn);
+	}
+	if (fFire == 1) {
+		alt_up_ps2_disable_read_interrupt(ps2);
+		turretFire(turn, 100);
+		turn = (turn + 1) % numPlayers;
+		alt_up_ps2_enable_read_interrupt(ps2);
+		printf("Before enabled interupt\n");
+		alt_up_ps2_clear_fifo(ps2);
+		printf("Fifo cleared\n");
+		fFire = 0;
+	}
+
+	//printf("degree: %d \n",p[turn].deg);
+
+	//clearScreen();
+	//updateField();
+
+	/*	printf("BEFORE SWITCH SCREEN\n");
+	 updateScreen();
+	 printf("AFTER SWTICH SCREEN CHARACETRS SHOULD BE GONE; GOING TO SWITCH BACK AND PUT CHAR ON\n");
+	 usleep(1000000);
+	 updateScreen();
+	 printf("BEFORE PRINT CHARACTERS\n");
+	 usleep(1000000);*/
+	for (i = 0; i < numPlayers; ++i) {
+		checkPlayerFalling(i);
+		updatePlayer(i);
+		printHp(i);
+	}
+	/*
+	 printf("After PRINT CHARACTERS\n");
+	 usleep(1000000);
+	 */
+
+	updateScreen();
+	usleep(1000);
+
+	//TODO: check all players
+	if (p[pOne].hp == 0 || p[pTwo].hp == 0) {
+		usleep(1000000);
+		state = 3;
+	}
+}

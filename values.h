@@ -30,6 +30,12 @@
 #define PAGE_DOWN 0x71
 #define SPACEBAR 0x29
 #define BACKSPACE 0x66
+//TODO: chnage the mask colour
+#define MASK 0x0000
+#define MARIO 0
+#define LUIGI 1
+#define COMPUTER 0
+#define HUMAN 1
 
 typedef struct player{
 	int x;
@@ -38,11 +44,12 @@ typedef struct player{
 	int dy;
 	int deg;
 	int hp;
-	int colour;
+	int character;
 	int points;
 	int alive;
 	int gas;
 	int dir;
+	int colour;
 	char name[10];
 	int type;
 } player;
@@ -53,4 +60,5 @@ struct bullet{
 	int dx;
 	int dy;
 };
+
 #endif

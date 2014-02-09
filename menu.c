@@ -10,13 +10,13 @@
 char *display_string;//string to write to screen
 char player_name[10];//player name
 int count = 0;//count for player name
-char playersconfig = 1;//number of players configured
-int playercolor;
+char playersconfig;//number of players configured
+int playerCharacter;
 int playertype;
 
 void initState0() {
-	playersconfig = 1;
-	playercolor = 0;
+	playersconfig = 0;
+	playerCharacter = MARIO;
 	playertype = 0;
 
 	printString("TANKS", 36, 10);
@@ -34,23 +34,22 @@ void initState0() {
 	updateScreen();
 }
 
-void initState1(int playernum) {
+void initState1(int id) {
 	clearCharBuffer();
 	clearScreen();
 	printString("TANKS", 36, 10);
 	printString("Player #", 33, 14);
-	if (playernum == 1)
+	if (id == pOne)
 		printString("1", 42, 14);
-	else if (playernum == 2)
+	else if (id == pTwo)
 		printString("2", 42, 14);
-	else if (playernum == 3)
-		printString("3", 42, 14);
-	else if (playernum == 4)
-		printString("4", 42, 14);
-	//print player number
+	else if (id == pThree)
+		printString("1", 42, 14);
+	else if (id == pFour)
+		printString("1", 42, 14);
 	printString("ENTER NAME: ", 14, 20);
 	printString("CHANGE COLOR: ", 14, 24);
-	printString("PINK", 28, 24);//default
+	printString("MARIO", 28, 24);//default
 	//print player color
 	printString("SELECT PLAYER TYPE: ", 14, 28);
 	printString("COMP", 34, 28);//default
@@ -81,15 +80,16 @@ void state_1(int decode_mode, alt_8 buf, char ascii) {
 
 	else if (decode_mode == KB_BINARY_MAKE_CODE) {
 		if (buf == SPACEBAR) {
-			if (playersconfig < numPlayers) {
-				initPlayer(playersconfig, playercolor, player_name, playertype);
-				clearPlayerName();
-				playersconfig++;//this corresponds to the player ID
-				initState1(playersconfig);
-			} else {
-				initPlayer(playersconfig, playercolor, player_name, playertype);
+			//TODO: make an options menu to adust hp
+			//printf("playerCharacter %i",playerCharacter);
+			initPlayer(playersconfig, playerCharacter, player_name, playertype);
+			clearPlayerName();
+			playersconfig++;//this corresponds to the player ID
+			initState1(playersconfig);
+			printf("numPlyaers %i\n", numPlayers);
+			printf("playersconfig %i\n", playersconfig);
+			if (playersconfig == numPlayers)
 				state = 2;
-			}
 		} else if (buf == BACKSPACE) {//back space
 			if (count > 0) {
 				player_name[count - 1] = 0;
@@ -100,21 +100,21 @@ void state_1(int decode_mode, alt_8 buf, char ascii) {
 	} else if (decode_mode == KB_LONG_BINARY_MAKE_CODE) {
 		switch (buf) {
 		case LEFT_ARROW: //left
-			if (playercolor == 0) {
-				playercolor = 1;
-				AdjustChar("BLUE", 28, 24);
+			if (playerCharacter == LUIGI) {
+				playerCharacter = MARIO;
+				AdjustChar("MARIO", 28, 24);
 			} else {
-				playercolor = 0;
-				AdjustChar("PINK", 28, 24);
+				playerCharacter = LUIGI;
+				AdjustChar("LUIGI", 28, 24);
 			}
 			break;
 		case RIGHT_ARROW: //right
-			if (playercolor == 0) {
-				playercolor = 1;
-				AdjustChar("BLUE", 28, 24);
+			if (playerCharacter == LUIGI) {
+				playerCharacter = MARIO;
+				AdjustChar("MARIO", 28, 24);
 			} else {
-				playercolor = 0;
-				AdjustChar("PINK", 28, 24);
+				playerCharacter = LUIGI;
+				AdjustChar("LUIGI", 28, 24);
 			}
 			break;
 		case UP_ARROW: //up
@@ -155,34 +155,6 @@ void Name_Entered(char *a) {
 	count++;
 	if (count <= 10)
 		AdjustChar(player_name, 26, 20);
-}
-
-void initPlayer(int id, int colour, char *name, int type) {
-	if (id == 1)
-		p[id].x = 15;
-	else if (id == 2)
-		p[id].x = 60;
-	else if (id == 3)
-		p[id].x = 30;
-	else if (id == 4)
-		p[id].x = 45;
-	p[id].y = 40;
-	if (id == 1 || id == 3)
-		p[id].deg = 30;
-	else if (id == 2 || id == 4)
-		p[id].deg = 150;
-	p[id].hp = 100;
-	p[id].colour = colour;//0=PINK//1=BLUE
-	p[id].points = 0;
-	p[id].alive = 1;//0=dead,1=alive
-	p[id].gas = 100;
-	if (id == 1 || id == 3)
-		p[id].dir = 0;
-	else if (id == 2 || id == 4)
-		p[id].dir = 1;
-	//0=right, 1=left
-	strcpy((p[id].name), name);
-	p[id].type = type;
 }
 
 void updateNumPlayers() {

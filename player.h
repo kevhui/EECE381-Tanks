@@ -18,7 +18,7 @@ extern struct player p[3];
 extern int numPlayers;
 extern int turn;
 
-void kevininitPlayer(int,int,int,int,int,int,int,int,int,int,char*);
+void initPlayer(int,int,char *,int);
 void moveLeft(int);
 void moveRight(int);
 void turretCW(int);
