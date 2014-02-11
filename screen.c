@@ -9,6 +9,7 @@
 
 alt_up_pixel_buffer_dma_dev *pixel_buffer;
 alt_up_char_buffer_dev *char_buffer;
+alt_up_char_buffer_dev *timer_buffer;
 int i = 0;
 
 //initialises the screen buffer
@@ -44,7 +45,6 @@ void updateScreen() {
 	//printf("is it white?"); 	for (count = 0; count < wait; ++count) {	}
 }
 
-//TODO: Print the whole field without lag
 //prints the field to the screen
 void updateField() {
 	// Draw a rectangle for the field
@@ -105,10 +105,7 @@ void updatePlayer(int id) {
 	}
 }
 
-//prints a bullet to the screen
-//TODO: make the bullet not one pixel
-void updateBullet(int x, int y) {
-	//only redraw the bullet
+void undrawBullet(int x, int y) {
 	int i, j;
 	unsigned int addr;
 	int offset = 10;
@@ -121,11 +118,20 @@ void updateBullet(int x, int y) {
 			//alt_up_pixel_buffer_dma_draw(pixel_buffer,hyrule[j][i],i,j);
 		}
 	}
-	//must redraw player to compensate for blackbox of bullet
+	//must redraw player and UI to compensate for blackbox of bullet
 	for (i = 0; i < numPlayers; ++i) {
-		updatePlayer(i);
+		if (p[i].alive)
+			updatePlayer(i);
 	}
+	drawGas(p[turn].gas);
+	drawPower(p[turn].power);
+	drawHealth(p[pOne].hp, p[pTwo].hp, p[pThree].hp, p[pFour].hp);
+}
 
+//prints a bullet to the screen
+//TODO: make the bullet not one pixel
+void updateBullet(int x, int y) {
+	//only redraw the bullet
 	alt_up_pixel_buffer_dma_draw(pixel_buffer, 0xFFFF, x, y);
 }
 
@@ -159,12 +165,83 @@ void printLines() {
 void initCharBuffer() {
 	char_buffer = alt_up_char_buffer_open_dev("/dev/char_drawer");
 	alt_up_char_buffer_init(char_buffer);
+	alt_up_char_buffer_init(timer_buffer);
 }
 
 //Prints string
 void printString(char *out_string, int x, int y) {
 	// Write some text
 	alt_up_char_buffer_string(char_buffer, out_string, x, y);
+}
+
+void printTimer(int time) {
+	int x = 40;
+	int y = 10;
+	switch (time) {
+	case 0:
+		alt_up_char_buffer_string(char_buffer, " 0", x, y);
+		break;
+	case 1:
+		alt_up_char_buffer_string(char_buffer, " 1", x, y);
+		break;
+	case 2:
+		alt_up_char_buffer_string(char_buffer, " 2", x, y);
+		break;
+	case 3:
+		alt_up_char_buffer_string(char_buffer, " 3", x, y);
+		break;
+	case 4:
+		alt_up_char_buffer_string(char_buffer, " 4", x, y);
+		break;
+	case 5:
+		alt_up_char_buffer_string(char_buffer, " 5", x, y);
+		break;
+	case 6:
+		alt_up_char_buffer_string(char_buffer, " 6", x, y);
+		break;
+	case 7:
+		alt_up_char_buffer_string(char_buffer, " 7", x, y);
+		break;
+	case 8:
+		alt_up_char_buffer_string(char_buffer, " 8", x, y);
+		break;
+	case 9:
+		alt_up_char_buffer_string(char_buffer, " 9", x, y);
+		break;
+	case 10:
+		alt_up_char_buffer_string(char_buffer, "10", x, y);
+		break;
+	case 11:
+		alt_up_char_buffer_string(char_buffer, "11", x, y);
+		break;
+	case 12:
+		alt_up_char_buffer_string(char_buffer, "12", x, y);
+		break;
+	case 13:
+		alt_up_char_buffer_string(char_buffer, "13", x, y);
+		break;
+	case 14:
+		alt_up_char_buffer_string(char_buffer, "14", x, y);
+		break;
+	case 15:
+		alt_up_char_buffer_string(char_buffer, "15", x, y);
+		break;
+	case 16:
+		alt_up_char_buffer_string(char_buffer, "16", x, y);
+		break;
+	case 17:
+		alt_up_char_buffer_string(char_buffer, "17", x, y);
+		break;
+	case 18:
+		alt_up_char_buffer_string(char_buffer, "18", x, y);
+		break;
+	case 19:
+		alt_up_char_buffer_string(char_buffer, "19", x, y);
+		break;
+	case 20:
+		alt_up_char_buffer_string(char_buffer, "20", x, y);
+		break;
+	}
 }
 
 //Prints string
@@ -273,8 +350,6 @@ void drawName(char* name1, char* name2, char* name3, char* name4) {
 	}
 }
 
-
-// 0<= power <= 100
 void drawHealth(int health1, int health2, int health3, int health4) {
 	int i, j, x_start, x_coordinate, y_coordinate;
 	int count = 0;
@@ -357,18 +432,18 @@ void drawHealth(int health1, int health2, int health3, int health4) {
 		x_coordinate = x_start;
 		y_coordinate = NAME_HEIGHT;
 
-		percentage = (HEALTH_X_GREEN_END - HEALTH_X_GREEN_START) * health / 100;
+		percentage = (HEALTH_GREEN_X_END - HEALTH_GREEN_X_START) * health / 100;
 		for (j = 0; j < HEALTH_BAR_HEIGHT; j++, y_coordinate++) {
 			// y_coordinate in the green region
-			if ((j >= HEALTH_Y_GREEN_START) && (j <= HEALTH_Y_GREEN_END)) {
+			if ((j >= HEALTH_GREEN_Y_START) && (j <= HEALTH_GREEN_Y_END)) {
 				// Before the grey area
-				for (i = 0, x_coordinate = x_start; i <= HEALTH_Y_GREEN_START
+				for (i = 0, x_coordinate = x_start; i <= HEALTH_GREEN_Y_START
 						+ percentage; i++, x_coordinate++) {
 					alt_up_pixel_buffer_dma_draw(pixel_buffer,
 							health_bar[j][i], x_coordinate, y_coordinate);
 				}
 				// Grey area - After the percentage, before the border
-				for (; i <= HEALTH_X_GREEN_END; i++, x_coordinate++) {
+				for (; i <= HEALTH_GREEN_X_END; i++, x_coordinate++) {
 					alt_up_pixel_buffer_dma_draw(pixel_buffer, 0x7BEF,
 							x_coordinate, y_coordinate);
 				}
@@ -385,6 +460,281 @@ void drawHealth(int health1, int health2, int health3, int health4) {
 			}
 		}
 		count++;
+	}
+}
+
+void drawGas(int gas) {
+	int i, j, x_start, y_start, x_coordinate, y_coordinate, percentage;
+
+	x_start = 3;
+	y_start = CHARACTER_MARIO_HEIGHT + 10;
+
+	percentage = (GAS_BLUE_Y_END - GAS_BLUE_Y_START) * gas / 100;
+
+	for (i = 0, x_coordinate = x_start; i < GAS_BAR_WIDTH; i++, x_coordinate++) {
+		// In the region
+		if ((i >= GAS_BLUE_X_START) && (i <= GAS_BLUE_X_END)) {
+
+			for (j = GAS_BAR_HEIGHT - 1, y_coordinate = y_start; j
+					> GAS_BLUE_Y_END; j--, y_coordinate++) {
+				alt_up_pixel_buffer_dma_draw(pixel_buffer, gas_bar[j][i],
+						x_coordinate, y_coordinate);
+			}
+			// Grey area - After the percentage, before the border
+			for (; j >= GAS_BLUE_Y_START + percentage; j--, y_coordinate++) {
+				alt_up_pixel_buffer_dma_draw(pixel_buffer, 0x7BEF,
+						x_coordinate, y_coordinate);
+			}
+
+			// After the grey area, Start the border again
+			for (; j >= 0; j--, y_coordinate++) {
+				alt_up_pixel_buffer_dma_draw(pixel_buffer, gas_bar[j][i],
+						x_coordinate, y_coordinate);
+			}
+		} else {
+			for (j = GAS_BAR_HEIGHT - 1, y_coordinate = y_start; j >= 0; j--, y_coordinate++) {
+				alt_up_pixel_buffer_dma_draw(pixel_buffer, gas_bar[j][i],
+						x_coordinate, y_coordinate);
+			}
+		}
+	}
+
+	if (gas == 99) {
+		for (j = 0, y_coordinate = y_start + GAS_BLUE_Y_START + 2; j < 1; j++, y_coordinate++) {
+			for (i = 0, x_coordinate = x_start + GAS_BLUE_X_START; i
+					< GAS_BLUE_X_END - GAS_BLUE_X_START + 1; i++, x_coordinate++)
+				alt_up_pixel_buffer_dma_draw(pixel_buffer, 0x4e9a,
+						x_coordinate, y_coordinate);
+		}
+	} else if (gas == 100) {
+		for (j = 0, y_coordinate = y_start + GAS_BLUE_Y_START + 1; j < 2; j++, y_coordinate++) {
+			for (i = 0, x_coordinate = x_start + GAS_BLUE_X_START; i
+					< GAS_BLUE_X_END - GAS_BLUE_X_START + 1; i++, x_coordinate++)
+				alt_up_pixel_buffer_dma_draw(pixel_buffer, 0x4e9a,
+						x_coordinate, y_coordinate);
+		}
+	}
+
+}
+
+// 0<= power <= 100 - red
+void drawPower(int power) {
+	int i, j, x_start, y_start, x_coordinate, y_coordinate, percentage;
+
+	x_start = SCREEN_WIDTH - 3 - POWER_BAR_WIDTH;
+	y_start = CHARACTER_MARIO_HEIGHT + 10;
+
+	percentage = (POWER_RED_Y_END - POWER_RED_Y_START) * power / 100;
+
+	for (i = 0, x_coordinate = x_start; i < POWER_BAR_WIDTH; i++, x_coordinate++) {
+		// In the region
+		if ((i >= POWER_RED_X_START) && (i <= POWER_RED_X_END)) {
+
+			for (j = POWER_BAR_HEIGHT - 1, y_coordinate = y_start; j
+					> POWER_RED_Y_END; j--, y_coordinate++) {
+				fastPixel(x_coordinate, y_coordinate, power_bar[j][i]);
+			}
+
+			// Grey area - After the percentage, before the border
+			for (; j >= POWER_RED_Y_START + percentage; j--, y_coordinate++) {
+				fastPixel(x_coordinate, y_coordinate, 0x7BEF);
+			}
+
+			// After the grey area, Start the border again
+			for (; j >= 0; j--, y_coordinate++) {
+				fastPixel(x_coordinate, y_coordinate, power_bar[j][i]);
+			}
+		} else {
+			for (j = POWER_BAR_HEIGHT - 1, y_coordinate = y_start; j >= 0; j--, y_coordinate++) {
+				fastPixel(x_coordinate, y_coordinate, power_bar[j][i]);
+			}
+		}
+	}
+
+	if (power == 99) {
+		for (j = 0, y_coordinate = y_start + POWER_RED_Y_START + 2; j < 1; j++, y_coordinate++) {
+			for (i = 0, x_coordinate = x_start + POWER_RED_X_START; i
+					< POWER_RED_X_END - POWER_RED_X_START; i++, x_coordinate++)
+				fastPixel(x_coordinate, y_coordinate, 0xd800);
+			fastPixel(x_coordinate, y_coordinate, 0xb963);
+		}
+	} else if (power == 100) {
+		for (j = 0, y_coordinate = y_start + POWER_RED_Y_START + 1; j < 2; j++, y_coordinate++) {
+			for (i = 0, x_coordinate = x_start + POWER_RED_X_START; i
+					< POWER_RED_X_END - POWER_RED_X_START; i++, x_coordinate++)
+				fastPixel(x_coordinate, y_coordinate, 0xd800);
+			fastPixel(x_coordinate, y_coordinate, 0xb963);
+		}
+	}
+
+}
+
+// Bullet Border 20px x 20px
+// 	Bullet 15px x 15px
+void drawBullet(int bulletType) {
+	int i, j, x_start, x_coordinate, y_coordinate, bullet_height, bullet_width;
+	int bullet[14][14];
+
+	x_start = (CHARACTER_MARIO_WIDTH + HEALTH_BAR_WIDTH) * 2;
+	for (j = 0; j < BULLET_BORDER_HEIGHT; j++, y_coordinate++) {
+		for (i = 0, x_coordinate = x_start; i < BULLET_BORDER_WIDTH; i++, x_coordinate++) {
+			alt_up_pixel_buffer_dma_draw(pixel_buffer, bullet_border[j][i],
+					x_coordinate, j);
+		}
+	}
+
+	/*
+	 // Bullet
+	 if (bulletType == 1){
+	 bullet_height = BULLET1_HEIGHT;
+	 bullet_width = BULLET1_WIDTH;
+	 bullet = bullet1;
+	 }
+
+	 // x_start = right after the border
+	 x_start = HEALTH_BAR_WIDTH + GAS_BAR_WIDTH + 5;
+	 // y_coordinate starts at 5, right after the border
+	 y_coordinate = 5;
+	 for (j = 0 ; j < bullet_height ; j++,y_coordinate++){
+	 for(i = 0,x_coordinate = x_start; i < bullet_width ; i++,x_coordinate++){
+	 alt_up_pixel_buffer_dma_draw(pixel_buffer,bullet[j][i],x_coordinate,y_coordinate);
+	 }
+	 }
+	 */
+}
+
+// Wind 20px x 10px
+// Wind Direction 20px x 10px
+void drawWindIndicator(int windLevel) {
+	int i, j, x_coordinate, y_coordinate, x_start;
+	x_start = (CHARACTER_MARIO_WIDTH + HEALTH_BAR_WIDTH) * 2;
+
+	// Right
+	if (windLevel == 1) {
+		for (j = 0, y_coordinate = BULLET_BORDER_HEIGHT; j
+				< WIND_DIRECTION_HEIGHT; j++, y_coordinate++) {
+			for (i = 0, x_coordinate = x_start; i < WIND_DIRECTION_WIDTH; i++, x_coordinate++) {
+				alt_up_pixel_buffer_dma_draw(pixel_buffer,
+						wind_direction[j][i], x_coordinate, y_coordinate);
+			}
+		}
+	}
+	// Left
+	else {
+		for (j = 0, y_coordinate = BULLET_BORDER_HEIGHT; j
+				< WIND_DIRECTION_HEIGHT; j++, y_coordinate++) {
+			for (i = WIND_DIRECTION_WIDTH - 1, x_coordinate = x_start; i >= 0; i--, x_coordinate++) {
+				alt_up_pixel_buffer_dma_draw(pixel_buffer,
+						wind_direction[j][i], x_coordinate, y_coordinate);
+			}
+		}
+	}
+}
+
+void displayHighScore(char *player1, char *player2, char *player3,
+		char *player4) {
+	score list[SCORE_BUFFER_SIZE];
+	int player_score[11];
+	score max_score[11];
+	char *player_name = player1;
+	char string_buffer[3];
+	char tmp[2];
+	int x_coordinate, y_coordinate, x_start;
+	int position = 0;
+	int i, j;
+
+	clearScreen();
+	if (getAllScore(list) == -1) {
+		alt_up_char_buffer_string(char_buffer, "No SD card inserted!", 30, 20);
+	} else {
+
+		for (i = SCREEN_WIDTH / 2 - 1, j = 0; j < SCREEN_HEIGHT; j++) {
+			alt_up_pixel_buffer_dma_draw(pixel_buffer, 0xffff, i, j);
+		}
+
+		for (i = 0; list[i].name[0] != '\0'; i++) {
+			printf("player:%s score:%s\n", list[i].name, list[i].score);
+		}
+
+		// Print the personal score
+
+		alt_up_char_buffer_string(char_buffer, "Personal Score", 13, 0);
+
+		while (player_name != NULL) {
+
+			// Top left
+			if (position == 0) {
+				x_coordinate = 7;
+				y_coordinate = 2;
+			}
+			// Top right
+			else if (position == 1) {
+				x_coordinate = 27;
+				y_coordinate = 2;
+			}
+			// Bottom left
+			else if (position == 2) {
+				x_coordinate = 7;
+				y_coordinate = SCREEN_CHARACTER_HEIGHT / 2 + 1;
+			}
+			// Bottom right
+			else {
+				x_coordinate = 27;
+				y_coordinate = SCREEN_CHARACTER_HEIGHT / 2 + 1;
+			}
+
+			alt_up_char_buffer_string(char_buffer, player_name, x_coordinate,
+					y_coordinate);
+			x_coordinate += 2;
+			y_coordinate += 2;
+			getPersonalScore(list, player_score, player_name);
+			for (i = 0; player_score[i] != -1; i++) {
+				sprintf(string_buffer, "%d", player_score[i]);
+				alt_up_char_buffer_string(char_buffer, string_buffer,
+						x_coordinate, y_coordinate);
+				y_coordinate += 2;
+			}
+
+			if (position == 0)
+				player_name = player2;
+			else if (position == 1)
+				player_name = player3;
+			else if (position == 2)
+				player_name = player4;
+			else
+				player_name = NULL;
+			position++;
+		}
+
+		// Print the highest score
+		alt_up_char_buffer_string(char_buffer, "Highest Score",
+				SCREEN_CHARACTER_WIDTH / 2 + 13, 0);
+
+		x_start = SCREEN_CHARACTER_WIDTH / 2 + 10;
+		x_coordinate = x_start;
+		y_coordinate = 0;
+
+		y_coordinate = y_coordinate + 2;
+		getMax10Score(list, max_score);
+		for (i = 0; max_score[i].name[0] != '\0'; i++) {
+			tmp[0] = (char) ((int) '0' + i + 1);
+			tmp[1] = '\0';
+			alt_up_char_buffer_string(char_buffer, tmp, x_coordinate,
+					y_coordinate);
+			x_coordinate++;
+			alt_up_char_buffer_string(char_buffer, ".", x_coordinate,
+					y_coordinate);
+			x_coordinate += 2;
+
+			alt_up_char_buffer_string(char_buffer, max_score[i].name,
+					x_coordinate, y_coordinate);
+			x_coordinate += 10;
+			alt_up_char_buffer_string(char_buffer, max_score[i].score,
+					x_coordinate, y_coordinate);
+
+			x_coordinate = x_start;
+			y_coordinate += 2;
+		}
 	}
 }
 

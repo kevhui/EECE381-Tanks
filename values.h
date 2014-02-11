@@ -27,7 +27,7 @@
 #define UP_ARROW 0x75
 #define DOWN_ARROW 0x72
 #define PAGE_UP 0x7d
-#define PAGE_DOWN 0x71
+#define PAGE_DOWN 0x7A
 #define SPACEBAR 0x29
 #define BACKSPACE 0x66
 //TODO: chnage the mask colour
@@ -38,6 +38,8 @@
 #define HUMAN 1
 #define SCREEN_CHARACTER_WIDTH 80
 #define SCREEN_CHARACTER_HEIGHT 60
+#define ALIVE 1
+#define DEAD 0
 
 typedef struct player {
 	int x;
@@ -54,6 +56,7 @@ typedef struct player {
 	int colour;
 	char name[10];
 	int type;
+	int power;
 } player;
 
 struct bullet {

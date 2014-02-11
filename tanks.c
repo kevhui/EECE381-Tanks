@@ -12,6 +12,7 @@
 #include <math.h>
 #include <io.h>
 #include <alt_legacy_irq.h>
+#include <sys/alt_irq.h>
 #include "altera_up_ps2_keyboard.h"
 #include "altera_up_avalon_character_lcd.h"
 #include "altera_up_avalon_ps2.h"
@@ -21,16 +22,21 @@
 #include "values.h"
 #include "player.h"
 #include "menu.h"
-
+#include "sys/alt_alarm.h"
+#include "sys/alt_timestamp.h"
 
 static void initKeyboard();//initializes keyboard
 void runGame();
+void setPlayerTurn();
+void updateActions();
 
+int windPower = 0;
 struct player p[3];
 int field[SCREEN_WIDTH];
 int map[SCREEN_HEIGHT][SCREEN_WIDTH];
 int turn = pOne;
 int numPlayers;
+float start_time;
 //keyboard interrupt variables
 alt_up_ps2_dev *ps2;
 KB_CODE_TYPE decode_mode;
@@ -45,8 +51,12 @@ int fRight = 0;
 int fDown = 0;
 int fUp = 0;
 int fFire = 0;
+int fpUp = 0;
+int fpDown = 0;
 
-void WinScreenTest() {
+void GameOverScreen() {
+	clearScreen();
+	updateScreen();
 	clearCharBuffer();
 	printString("GAME OVER!", 30, 25);
 	usleep(1000000);
@@ -76,10 +86,30 @@ static void keyboard_ISR(void *c, alt_u32 id) { //keyboard interrupt handler
 				fDown = 1;
 				break;
 			case 0: //page up
-				//changes power, no function yet
 				break;
 			case 1: //page down
-				//changes power, no function yet
+				break;
+			}
+		} else if (decode_mode == KB_LONG_BINARY_MAKE_CODE) {
+			printf("Pressed %c\n", ascii);
+			switch (buf[0]) {
+			case LEFT_ARROW: //left arrow
+				fLeft = 1;
+				break;
+			case RIGHT_ARROW: //right arrow
+				fRight = 1;
+				break;
+			case UP_ARROW: //up arrow
+				fUp = 1;
+				break;
+			case DOWN_ARROW: //down arrow
+				fDown = 1;
+				break;
+			case PAGE_UP: //page up
+				fpUp = 1;
+				break;
+			case PAGE_DOWN: //page down
+				fpDown = 1;
 				break;
 			}
 		} else if (decode_mode == KB_BREAK_CODE) {
@@ -103,6 +133,33 @@ static void keyboard_ISR(void *c, alt_u32 id) { //keyboard interrupt handler
 				break;
 			case 1: //page down
 				//changes power, no function yet
+				break;
+			}
+
+		} else if (decode_mode == KB_LONG_BREAK_CODE) {
+			printf("Released %c\n", ascii);
+			printf("Released %i\n", buf[0]);
+			switch (buf[0]) {
+			case LEFT_ARROW: //left arrow
+				fLeft = 0;
+				break;
+			case RIGHT_ARROW: //right arrow
+				fRight = 0;
+				break;
+			case UP_ARROW: //up arrow
+				fUp = 0;
+				break;
+			case DOWN_ARROW: //down arrow
+				fDown = 0;
+				break;
+			case SPACEBAR: //space bar
+				fFire = 0;
+				break;
+			case PAGE_UP: //page up
+				fpUp = 0;
+				break;
+			case PAGE_DOWN: //page down
+				fpDown = 0;
 				break;
 			}
 
@@ -132,6 +189,7 @@ void initKeyboard() {
 
 int main(void) {
 	while (1) {
+		int setTime = 15;
 		numPlayers = 2;
 		initScreen();
 		clearScreen();
@@ -139,6 +197,7 @@ int main(void) {
 		clean_up();
 		initKeyboard();
 		initState0();
+		initSD();
 
 		//This is for Isaac cause he doesnt have a keyboard
 		if (IORD(keys,0) == 8) {
@@ -162,33 +221,45 @@ int main(void) {
 		clearCharBuffer();
 		clearScreen();
 
+		//enable keyboard IRQ
 		void* keyboard_control_register_ptr = (void*) (KEYBOARD_BASE + 4);
 		alt_irq_register(KEYBOARD_IRQ, keyboard_control_register_ptr,
 				keyboard_ISR);
 		alt_up_ps2_enable_read_interrupt(ps2);
 
+		//Draw field and UI to both buffers
 		initField();
 		updateField();
-		drawName(p[pOne].name,p[pTwo].name,p[pThree].name,p[pFour].name);
-		//drawGas(p[pOne].gas,p[pTwo].gas,p[pThree].gas,p[pFour].gas);
-		drawHealth(p[pOne].hp,p[pTwo].hp,p[pThree].hp,p[pFour].hp);
+		drawName(p[pOne].name, p[pTwo].name, p[pThree].name, p[pFour].name);
+		drawGas(p[pOne].gas);
+		drawHealth(p[pOne].hp, p[pTwo].hp, p[pThree].hp, p[pFour].hp);
 		//drawBullet(0);
 		//drawWindIndicator(1);
 		updateScreen();
 		updateField();
-		drawName(p[pOne].name,p[pTwo].name,p[pThree].name,p[pFour].name);
-		//drawGas(p[pOne].gas,p[pTwo].gas,p[pThree].gas,p[pFour].gas);
-		drawHealth(p[pOne].hp,p[pTwo].hp,p[pThree].hp,p[pFour].hp);
+		drawName(p[pOne].name, p[pTwo].name, p[pThree].name, p[pFour].name);
+		drawGas(p[pOne].gas);
+		drawHealth(p[pOne].hp, p[pTwo].hp, p[pThree].hp, p[pFour].hp);
 		//drawBullet(0);
 		//drawWindIndicator(1);
 		updateScreen();
 
+		float time;
+		alt_timestamp_start();
 
+		start_time = (float) alt_timestamp() / (float) alt_timestamp_freq();
+		printf("NUM PLAYERA %i\n", numPlayers);
 		while (state == 2) {
+			time = (float) alt_timestamp() / (float) alt_timestamp_freq()- start_time;
+			if(time >= setTime){
+				setPlayerTurn();
+			}
 			runGame();
+			printTimer(setTime - time);
+
 		}
 		alt_up_ps2_disable_read_interrupt(ps2);
-		WinScreenTest();
+		GameOverScreen();
 		while (state == 3)
 			;
 
@@ -197,7 +268,54 @@ int main(void) {
 
 void runGame(void) {
 	undrawPlayers();
+	updateActions();
 	int i;
+
+
+
+	//printf("degree: %d \n",p[turn].deg);
+
+	//clearScreen();
+	//updateField();
+
+	for (i = 0; i < numPlayers; ++i) {
+		if (p[i].alive) {
+			checkPlayerFalling(i);
+			updatePlayer(i);
+		}
+	}
+
+	drawGas(p[turn].gas);
+	drawPower(p[turn].power);
+	updateScreen();
+	usleep(1000);
+
+	//TODO: check all players
+	int deadCount = 0;
+	for (i = 0; i < numPlayers; i++) {
+		if (p[i].alive == DEAD)
+			deadCount++;
+	}
+	if (deadCount == numPlayers - 1) {
+		usleep(500000);
+		state = 3;
+	}
+}
+
+void setPlayerTurn() {
+	alt_timestamp_start();
+	start_time = (float) alt_timestamp() / (float) alt_timestamp_freq();
+	int playerStatus;
+	do {
+		turn = (turn + 1) % numPlayers;
+		playerStatus = p[turn].alive;
+	} while (playerStatus == DEAD);
+	printf("turn %i\n", turn);
+	p[turn].gas = 100;
+}
+
+void updateActions() {
+
 	if (IORD(keys,0) == 8) {
 		moveLeft(turn);
 	}
@@ -208,10 +326,8 @@ void runGame(void) {
 	//turret fire
 	if (IORD(keys,0) == 2) {
 		//fire power should be 0<power<100
-		turretFire(turn, 100); //need to get power from keyboard
-
-		//TODO: skip players that are dead
-		turn = (turn + 1) % numPlayers;
+		turretFire(turn, 100, windPower, 2); //need to get power from keyboard
+		setPlayerTurn();
 
 	}
 	//turret CW
@@ -238,51 +354,28 @@ void runGame(void) {
 	if (fDown == 1) {
 		turretCW(turn);
 	}
+	if (fpDown == 1) {
+		if (p[turn].power - 1 >= 0)
+			p[turn].power--;
+	}
+	if (fpUp == 1) {
+		if (p[turn].power + 1 <= 100)
+			p[turn].power++;
+	}
 	if (fFire == 1) {
 		alt_up_ps2_disable_read_interrupt(ps2);
-		turretFire(turn, 100);
-		turn = (turn + 1) % numPlayers;
+		turretFire(turn, p[turn].power, windPower, 2);
+		setPlayerTurn();
 		alt_up_ps2_enable_read_interrupt(ps2);
 		printf("Before enabled interupt\n");
 		alt_up_ps2_clear_fifo(ps2);
 		printf("Fifo cleared\n");
 		fFire = 0;
-		//drawGas(p[pOne].gas,p[pTwo].gas,p[pThree].gas,p[pFour].gas);
-		drawHealth(p[pOne].hp,p[pTwo].hp,p[pThree].hp,p[pFour].hp);
+		drawHealth(p[pOne].hp, p[pTwo].hp, p[pThree].hp, p[pFour].hp);
 		//drawBullet(0);
 		//drawWindIndicator(1);
 		updateScreen();
-		drawHealth(p[pOne].hp,p[pTwo].hp,p[pThree].hp,p[pFour].hp);
-	}
-
-	//printf("degree: %d \n",p[turn].deg);
-
-	//clearScreen();
-	//updateField();
-
-	/*	printf("BEFORE SWITCH SCREEN\n");
-	 updateScreen();
-	 printf("AFTER SWTICH SCREEN CHARACETRS SHOULD BE GONE; GOING TO SWITCH BACK AND PUT CHAR ON\n");
-	 usleep(1000000);
-	 updateScreen();
-	 printf("BEFORE PRINT CHARACTERS\n");
-	 usleep(1000000);*/
-	for (i = 0; i < numPlayers; ++i) {
-		checkPlayerFalling(i);
-		updatePlayer(i);
-		printHp(i);
-	}
-	/*
-	 printf("After PRINT CHARACTERS\n");
-	 usleep(1000000);
-	 */
-
-	updateScreen();
-	usleep(1000);
-
-	//TODO: check all players
-	if (p[pOne].hp == 0 || p[pTwo].hp == 0) {
-		usleep(1000000);
-		state = 3;
+		drawHealth(p[pOne].hp, p[pTwo].hp, p[pThree].hp, p[pFour].hp);
 	}
 }
+

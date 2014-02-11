@@ -20,26 +20,30 @@
 #include "field.h"
 #include "images.h"
 #include "images_bars.h"
+#include "sd_card.h"
 
 void initScreen(void); //Initialise screen
 void initCharBuffer(void); //Initialise char buffer
 void clearScreen(void); //Clears screen
 void updateScreen(void); //Swaps buffers
 void undrawPlayers(void); //updates the players
+void undrawBullet(int,int);
 void updateField(void); //updates the field
 void updatePlayer(int); //updates the players
 void updateBullet(int, int); //updates the bullet
 void updateExplosion(int, int, int, int); //update the explosion
 void printLines(void); //draw lines
 void printString(char*, int, int); //print string
-void printHp(int); //print hp TODO:// change this to draw UI
+void printTimer(int); //print string
+void printHp(int); //print hp
 void drawTest(void); //testing drawing
 void clearCharBuffer(void); //clear char buffer
 void fastPixel(int, int, int); //draws a single pixel to screen
 void drawName(char*,char*,char*,char*);
 void drawTest(void);
 void drawHealth(int,int,int,int);
-void drawGas(int,int,int,int);
+void drawGas(int);
+void drawPower(int);
 //void drawBullet(int);
 //void drawWindIndicator(int);
 
