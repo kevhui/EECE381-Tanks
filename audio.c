@@ -40,16 +40,17 @@ int offset(short int fileHandle, aud_buf *ab){
 }
 
 int fill_buff(short int fileHandle, aud_buf *ab){
-	int start, end, i;
+	int i;
 	short int a = 0;
 	short int b = 0;
+	int start = ab->start;
+	int end = ab->end;
+	int audio_size = start > end ? start - end : start + MAX_BUFFER_SIZE - end;
+		audio_size--;
 
 	//printf("Fill buff\n");
 
-	start = ab->start;
-	end = ab->end;
-
-	for (i = 0; i < 960; i++) {
+	for (i = 0; i < audio_size; i++) {
 		a = alt_up_sd_card_read(fileHandle);
 		if(a < 0){
 //			//printf("|a = %i, b = %i |", a, b);

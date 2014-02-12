@@ -19,7 +19,7 @@ extern int numPlayers;
 extern int turn;
 extern int windPower;
 
-void initPlayer(int, int, char *, int);
+void initPlayer(int, int, char *, int, int, int);
 void moveLeft(int);
 void moveRight(int);
 void turretCW(int);

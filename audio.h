@@ -17,7 +17,7 @@
 #include "system.h"
 
 
-#define MAX_BUFFER_SIZE 960
+#define MAX_BUFFER_SIZE 9600
 
 typedef struct{
 	unsigned int buf[MAX_BUFFER_SIZE];

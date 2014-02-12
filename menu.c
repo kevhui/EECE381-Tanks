@@ -79,9 +79,10 @@ void state_0(int decode_mode, alt_8 buf) {
 			if (cursor == 0) {//on # of players
 				if (numPlayers > 2)
 					numPlayers -= 1;
-				snprintf(display_string, sizeof(display_string), "%d",
-						numPlayers);
-				AdjustChar(display_string, 29, 20);
+				updateNumPlayers();
+//				snprintf(display_string, sizeof(display_string), "%d",
+//						numPlayers);
+//				AdjustChar(display_string, 29, 20);
 			} else if (cursor == 1) {//on health points
 				if (hp > 10)
 					hp -= 10;
@@ -129,16 +130,17 @@ void state_0(int decode_mode, alt_8 buf) {
 			if (cursor == 0) {
 				if (numPlayers < 4)
 					numPlayers += 1;
-				snprintf(display_string, sizeof(display_string), "%d",
+					updateNumPlayers();
+/*				snprintf(display_string, sizeof(display_string), "%d",
 						numPlayers);
-				AdjustChar(display_string, 29, 20);
+				AdjustChar(display_string, 29, 20);*/
 			} else if (cursor == 1) {//on health points
 				if (hp < 100)
 					hp += 10;
 				snprintf(display_string, sizeof(display_string), "%d", hp);
 				AdjustChar(display_string, 25, 24);
 			} else if (cursor == 2) {
-				if (gas < 50)
+				if (gas < 100)
 					gas += 5;
 				snprintf(display_string, sizeof(display_string), "%d", gas);
 				AdjustChar(display_string, 15, 28);
@@ -226,22 +228,35 @@ void state_1(int decode_mode, alt_8 buf, char ascii) {
 			//TODO: make an options menu to adust hp
 			//printf("playerCharacter %i",playerCharacter);
 			if (playersconfig < numPlayers-1) {
+				if (count > 0){
 				initPlayer(playersconfig, playerCharacter, player_name,
-						playertype);
+						hp,gas,playertype);
+				}
+				else{
+				initPlayer(playersconfig, playerCharacter, "Guest",
+						hp,gas,playertype);
+				}
 				clearPlayerName();
 				playersconfig++;//this corresponds to the player ID
 				cursor = 0;
+				count = 0;
 				initState1(playersconfig);
 			} else {
+				if (count > 0){
 				initPlayer(playersconfig, playerCharacter, player_name,
-						playertype);
+						hp,gas,playertype);
+				}
+				else{
+				initPlayer(playersconfig, playerCharacter, "Guest",
+						hp,gas,playertype);
+				}
 				state = 2;
 				if(numPlayers == 2){
-					initPlayer(pThree, MARIO, NULL,HUMAN);
-					initPlayer(pFour, MARIO, NULL,HUMAN);
+					initPlayer(pThree, MARIO, NULL,hp,gas,HUMAN);
+					initPlayer(pFour, MARIO, NULL,hp,gas,HUMAN);
 				}
 				if(numPlayers == 3){
-					initPlayer(pFour, MARIO,NULL,HUMAN);
+					initPlayer(pFour, MARIO,NULL,hp,gas,HUMAN);
 				}
 			}
 		} else if (buf == BACKSPACE) {//back space
@@ -344,13 +359,13 @@ void Name_Entered(char *a) {
 void updateNumPlayers() {
 	switch (numPlayers) {
 	case 2:
-		AdjustChar("2", 22, 24);
+		AdjustChar("_2", 28, 20);
 		break;
 	case 3:
-		AdjustChar("3", 22, 24);
+		AdjustChar("_3", 28, 20);
 		break;
 	case 4:
-		AdjustChar("4", 22, 24);
+		AdjustChar("_4", 28, 20);
 		break;
 	}
 }

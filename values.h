@@ -3,6 +3,8 @@
 
 #include <system.h>
 
+#define TRUE 1
+#define FALSE 0
 #define GRAVITY -15
 #define PIXEL_SCALE 500
 #define SCREEN_WIDTH 320
@@ -12,7 +14,7 @@
 #define VERBOSE 0
 #define TANK_LENGTH 19
 #define TANK_HEIGHT 19
-#define TURRET_LENGTH 22
+#define TURRET_LENGTH 16
 #define pOne 0
 #define pTwo 1
 #define pThree 2
@@ -57,6 +59,7 @@ typedef struct player {
 	char name[10];
 	int type;
 	int power;
+	int isFalling;
 } player;
 
 struct bullet {

@@ -25,6 +25,7 @@
 #include "sys/alt_alarm.h"
 #include "sys/alt_timestamp.h"
 #include "audio.h"
+#include "system.h"
 
 static void initKeyboard();//initializes keyboard
 void runGame();
@@ -48,7 +49,7 @@ alt_u8 buf[4];
 aud_buf ab_1;
 aud_buf *ab = &ab_1;
 short int file_handle;
-char* fname = "clip.wav";
+char* fname = "brawl.wav";
 
 //set some of these in player struct!!!//
 volatile int state = 0;//state of game
@@ -260,8 +261,8 @@ int main(void) {
 
 		//This is for Isaac cause he doesnt have a keyboard
 		if (IORD(keys,0) == 8) {
-			initPlayer(pOne, MARIO, "pOne", HUMAN);
-			initPlayer(pTwo, LUIGI, "pTwo", HUMAN);
+			initPlayer(pOne, MARIO, "pOne", 50,100,HUMAN);
+			initPlayer(pTwo, LUIGI, "pTwo", 50,100,HUMAN);
 			state = 2;
 		} else {
 			while (state == 0) {
@@ -317,15 +318,12 @@ int main(void) {
 			}
 			runGame();
 			printTimer(setTime - time);
-//
 			loop_audio(file_handle, fname, ab);
-			runGame();
 		}
 		alt_up_ps2_disable_read_interrupt(ps2);
 		alt_up_audio_disable_write_interrupt(ab->audio);
 		alt_up_sd_card_fclose(file_handle);
 
-		alt_up_ps2_disable_read_interrupt(ps2);
 		GameOverScreen();
 		while (state == 3)
 			;
@@ -350,12 +348,10 @@ void runGame(void) {
 			updatePlayer(i);
 		}
 	}
-
 	drawGas(p[turn].gas);
 	drawPower(p[turn].power);
 	updateScreen();
-	usleep(1000);
-
+	//usleep(1000);
 	int deadCount = 0;
 	for (i = 0; i < numPlayers; i++) {
 		if (p[i].alive == DEAD)
@@ -391,7 +387,7 @@ void updateActions() {
 	//turret fire
 	if (IORD(keys,0) == 2) {
 		//fire power should be 0<power<100
-		turretFire(turn, 100, windPower, 1); //need to get power from keyboard
+		turretFire(turn, 100, windPower, 0); //need to get power from keyboard
 		setPlayerTurn();
 
 	}
@@ -428,8 +424,9 @@ void updateActions() {
 			p[turn].power++;
 	}
 	if (fFire == 1) {
+		if(!p[turn].isFalling){
 		alt_up_ps2_disable_read_interrupt(ps2);
-		turretFire(turn, p[turn].power, windPower, 2);
+		turretFire(turn, p[turn].power, windPower, 0);
 		setPlayerTurn();
 		alt_up_ps2_enable_read_interrupt(ps2);
 		printf("Before enabled interupt\n");
@@ -441,6 +438,7 @@ void updateActions() {
 		drawWindIndicator(1);
 		updateScreen();
 		drawHealth(p[pOne].hp, p[pTwo].hp, p[pThree].hp, p[pFour].hp);
+		}
 	}
 }
 

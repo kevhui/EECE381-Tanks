@@ -7,7 +7,7 @@
 
 #include "player.h"
 
-void initPlayer(int id, int character, char *name, int type) {
+void initPlayer(int id, int character, char *name, int hp, int gas, int type) {
 	switch (id) {
 	case pOne:
 		p[id].x = 50;
@@ -42,14 +42,15 @@ void initPlayer(int id, int character, char *name, int type) {
 	p[id].points = 0;
 	p[id].alive = ALIVE;
 	p[id].dir = RIGHT;
-	strcpy((p[id].name), name);
 	p[id].type = type;
 	p[id].character = character;//0=MARIO//1=LUIGI
+	strcpy((p[id].name), name);
+	p[id].isFalling = TRUE;
 
 	//TODO:these should be adjustable
 	//TODO: more than 3 hp start
-	p[id].hp = 100; //game options
-	p[id].gas = 50; //gas
+	p[id].hp = hp; //game options
+	p[id].gas = gas; //gas
 	p[id].power = 50;
 
 }
@@ -134,8 +135,8 @@ void turretFire(int turn, int power, int wind, int bulletType) {
 				p[turn].deg * p[turn].dir);
 		b.x = (turret_start_x) * PIXEL_SCALE;
 		b.y = (turret_start_y) * PIXEL_SCALE;
-		b.dx = (turret_start_x - (p[turn].x + TANK_LENGTH / 2)) * power;
-		b.dy = (turret_start_y - (p[turn].y)) * power;
+		b.dx = (getTurretWidth(p[turn].deg * p[turn].dir)) * power;
+		b.dy = -(getTurretHeight(p[turn].deg * p[turn].dir)) * power;
 		//printf("\tstart_x: %i\tx = %i\tdx = %i\tsin(deg)= %i",turret_start_x,b.x,b.dx,sin(p[turn].deg * M_PI) / 180);
 		//printf("\tstart_y: %i\ty = %i\tdy = %i",turret_start_y,b.y,b.dy);
 
@@ -180,10 +181,10 @@ void turretFire(int turn, int power, int wind, int bulletType) {
 			}
 		} while (bullet_alive);
 	} else if (bulletType == 1) {
-		fireBulletOne(turn, power, wind, bulletType);
+		//fireBulletOne(turn, power, wind, bulletType);
 	}
 	else if (bulletType == 2) {
-		fireBulletTwo(turn, power, wind, bulletType);
+		//fireBulletTwo(turn, power, wind, bulletType);
 	}
 
 }
@@ -200,8 +201,8 @@ void fireBulletOne(int turn, int power, int wind, int bulletType) {
 			p[turn].deg * p[turn].dir);
 	b.x = (turret_start_x) * PIXEL_SCALE;
 	b.y = (turret_start_y) * PIXEL_SCALE;
-	b.dx = (turret_start_x - (p[turn].x + TANK_LENGTH / 2)) * power;
-	b.dy = (turret_start_y - (p[turn].y)) * power;
+	b.dx = (getTurretWidth(p[turn].deg * p[turn].dir)) * power;
+	b.dy = -(getTurretHeight(p[turn].deg * p[turn].dir)) * power;
 	//printf("\tstart_x: %i\tx = %i\tdx = %i\tsin(deg)= %i",turret_start_x,b.x,b.dx,sin(p[turn].deg * M_PI) / 180);
 	//printf("\tstart_y: %i\ty = %i\tdy = %i",turret_start_y,b.y,b.dy);
 
@@ -331,8 +332,8 @@ void fireBulletTwo(int turn, int power, int wind, int bulletType) {
 			p[turn].deg * p[turn].dir);
 	b.x = (turret_start_x) * PIXEL_SCALE;
 	b.y = (turret_start_y) * PIXEL_SCALE;
-	b.dx = (turret_start_x - (p[turn].x + TANK_LENGTH / 2)) * power;
-	b.dy = (turret_start_y - (p[turn].y)) * power;
+	b.dx = (getTurretWidth(p[turn].deg * p[turn].dir)) * power;
+	b.dy = -(getTurretHeight(p[turn].deg * p[turn].dir)) * power;
 	//printf("\tstart_x: %i\tx = %i\tdx = %i\tsin(deg)= %i",turret_start_x,b.x,b.dx,sin(p[turn].deg * M_PI) / 180);
 	//printf("\tstart_y: %i\ty = %i\tdy = %i",turret_start_y,b.y,b.dy);
 
@@ -386,6 +387,7 @@ void fireBulletTwo(int turn, int power, int wind, int bulletType) {
 		saved_y = b.y;
 		saved_dx = b.dx;
 		saved_dy = b.dy;
+		bulletExplode(b.x,b.y,1);
 		for (bulletCount = 0; bulletCount < 8; bulletCount++) {
 			b.x = saved_x + rand()%(15*PIXEL_SCALE);
 			b.y = saved_y;
@@ -420,6 +422,7 @@ void fireBulletTwo(int turn, int power, int wind, int bulletType) {
 				//printf("b.x:%i \t b.y: %i ",b.x,b.y);
 				//printf("x:%i \t y: %i ",screenX,screenY);
 				//printf("dx:%i dy:%i \n",b.dx,b.dy);
+				bulletExplode(b.x,b.y,1);
 				if (getHitPlayer(screenX, screenY, 2)) {
 					bullet_alive = 0;
 					bulletExplode(screenX, screenY, 2);
@@ -488,8 +491,8 @@ int getHitGround(int x, int y, int bulletType) {
 	int i, j;
 	for (j = -1; j <= 1; j++) {
 		for (i = -1; i <= 1; ++i) {
-			if (map[y + j][x + i] != NOTHING) {
-				printf("hit ground!\n");
+			if ((map[y + j][x + i] != NOTHING)&& (y+j > field[i])) {
+				//printf("hit ground!\n");
 				return 1;
 			}
 		}
@@ -629,6 +632,7 @@ void bulletExplode(int x, int y, int bulletType) {
 			updateScreen();
 		}
 		break;
+
 	}
 }
 
@@ -645,6 +649,10 @@ void checkPlayerFalling(int id) {
 	//printf("TankNotTouchGroundCounter: %i\n", TankNotTouchGroundCounter);
 	if (TankNotTouchGroundCounter == TANK_LENGTH) {
 		p[id].y++;
+		p[id].isFalling = TRUE;
+	}
+	else{
+		p[id].isFalling = FALSE;
 	}
 }
 

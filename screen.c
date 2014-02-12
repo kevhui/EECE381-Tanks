@@ -98,7 +98,18 @@ void updatePlayer(int id) {
 		int t_startY = y + TANK_HEIGHT / 2 - getTurretHeight(deg) * 2 / 3;
 		int t_endX = x + TANK_LENGTH / 2 + getTurretWidth(deg);
 		int t_endY = y + TANK_HEIGHT / 2 - getTurretHeight(deg);
-
+		if(t_endX <= 0){
+			t_endX = 1;
+		}
+		if(t_endX >= SCREEN_WIDTH){
+			t_endX = SCREEN_WIDTH - 2;
+		}
+		if(t_startX <= 0){
+			t_startX = 1;
+		}
+		if(t_startX >= SCREEN_WIDTH){
+			t_startX = SCREEN_WIDTH - 2;
+		}
 		//TODO: switch case the character and choose appropriate colour
 		alt_up_pixel_buffer_dma_draw_line(pixel_buffer, t_startX, t_startY,
 				t_endX, t_endY, p[turn].colour, 1);
