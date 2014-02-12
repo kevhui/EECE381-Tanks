@@ -58,8 +58,17 @@ void GameOverScreen() {
 	clearScreen();
 	updateScreen();
 	clearCharBuffer();
-	printString("GAME OVER!", 30, 25);
-	usleep(1000000);
+	initSD();
+	int i;
+	for (i = 0; i < numPlayers; ++i) {
+		if(p[pOne].name != NULL){
+		writeSD(p[i].name,1);
+		printf("write %i\n",i);
+		}
+	}
+	displayHighScore(p[pOne].name,p[pTwo].name,p[pThree].name,p[pFour].name);
+//	printString("GAME OVER!", 30, 25);
+	usleep(10000000);
 	state = 0;
 }
 
@@ -197,7 +206,7 @@ int main(void) {
 		clean_up();
 		initKeyboard();
 		initState0();
-		initSD();
+
 
 		//This is for Isaac cause he doesnt have a keyboard
 		if (IORD(keys,0) == 8) {
@@ -233,15 +242,15 @@ int main(void) {
 		drawName(p[pOne].name, p[pTwo].name, p[pThree].name, p[pFour].name);
 		drawGas(p[pOne].gas);
 		drawHealth(p[pOne].hp, p[pTwo].hp, p[pThree].hp, p[pFour].hp);
-		//drawBullet(0);
-		//drawWindIndicator(1);
+		drawBullet(0);
+		drawWindIndicator(1);
 		updateScreen();
 		updateField();
 		drawName(p[pOne].name, p[pTwo].name, p[pThree].name, p[pFour].name);
 		drawGas(p[pOne].gas);
 		drawHealth(p[pOne].hp, p[pTwo].hp, p[pThree].hp, p[pFour].hp);
-		//drawBullet(0);
-		//drawWindIndicator(1);
+		drawBullet(0);
+		drawWindIndicator(1);
 		updateScreen();
 
 		float time;
@@ -326,7 +335,7 @@ void updateActions() {
 	//turret fire
 	if (IORD(keys,0) == 2) {
 		//fire power should be 0<power<100
-		turretFire(turn, 100, windPower, 2); //need to get power from keyboard
+		turretFire(turn, 100, windPower, 1); //need to get power from keyboard
 		setPlayerTurn();
 
 	}
@@ -372,8 +381,8 @@ void updateActions() {
 		printf("Fifo cleared\n");
 		fFire = 0;
 		drawHealth(p[pOne].hp, p[pTwo].hp, p[pThree].hp, p[pFour].hp);
-		//drawBullet(0);
-		//drawWindIndicator(1);
+		drawBullet(0);
+		drawWindIndicator(1);
 		updateScreen();
 		drawHealth(p[pOne].hp, p[pTwo].hp, p[pThree].hp, p[pFour].hp);
 	}

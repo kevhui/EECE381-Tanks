@@ -17,6 +17,7 @@
 extern struct player p[3];
 extern int numPlayers;
 extern int turn;
+extern int windPower;
 
 void initPlayer(int, int, char *, int);
 void moveLeft(int);

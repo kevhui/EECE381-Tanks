@@ -371,7 +371,7 @@ void drawHealth(int health1, int health2, int health3, int health4) {
 			if (numPlayers == 2) {
 				health = health2;
 				x_start = (CHARACTER_MARIO_WIDTH + HEALTH_BAR_WIDTH) * 2
-						+ WIND_WIDTH;
+						+ WIND_WIDTH + CHARACTER_MARIO_WIDTH;
 			} else if (numPlayers == 3) {
 				if (count == 1) {
 					health = health2;
@@ -379,7 +379,7 @@ void drawHealth(int health1, int health2, int health3, int health4) {
 							+ CHARACTER_MARIO_WIDTH;
 				} else if (count == 2) {
 					health = health3;
-					x_start = (CHARACTER_MARIO_WIDTH + HEALTH_BAR_WIDTH) * 2
+					x_start = (CHARACTER_MARIO_WIDTH + HEALTH_BAR_WIDTH) * 2 + CHARACTER_MARIO_WIDTH
 							+ WIND_WIDTH;
 				}
 			} else {
@@ -631,67 +631,67 @@ void drawWindIndicator(int windLevel) {
 	}
 }
 
-void displayHighScore(char *player1, char *player2, char *player3,
-		char *player4) {
+void displayHighScore(char *player1,char *player2,char *player3,char *player4){
 	score list[SCORE_BUFFER_SIZE];
 	int player_score[11];
 	score max_score[11];
 	char *player_name = player1;
-	char string_buffer[3];
+	char string_buffer[4];
 	char tmp[2];
-	int x_coordinate, y_coordinate, x_start;
+	int x_coordinate,y_coordinate,x_start;
 	int position = 0;
-	int i, j;
+	int i,j;
 
-	clearScreen();
-	if (getAllScore(list) == -1) {
-		alt_up_char_buffer_string(char_buffer, "No SD card inserted!", 30, 20);
-	} else {
 
-		for (i = SCREEN_WIDTH / 2 - 1, j = 0; j < SCREEN_HEIGHT; j++) {
-			alt_up_pixel_buffer_dma_draw(pixel_buffer, 0xffff, i, j);
+	if (getAllScore(list) == -1){
+		alt_up_char_buffer_string(char_buffer,"No SD card inserted!",30,20);
+	}
+	else{
+
+		for(i = SCREEN_WIDTH /2 - 1,j=0; j < SCREEN_HEIGHT ; j++){
+						alt_up_pixel_buffer_dma_draw(pixel_buffer,0xffff,i,j);
 		}
 
-		for (i = 0; list[i].name[0] != '\0'; i++) {
-			printf("player:%s score:%s\n", list[i].name, list[i].score);
+
+
+		for (i = 0 ; list[i].name[0] != '\0'; i++){
+			printf("player:%s score:%s\n",list[i].name,list[i].score);
 		}
 
 		// Print the personal score
 
-		alt_up_char_buffer_string(char_buffer, "Personal Score", 13, 0);
+		alt_up_char_buffer_string(char_buffer,"Personal Score",13,1);
 
-		while (player_name != NULL) {
+		while(player_name != NULL){
 
 			// Top left
-			if (position == 0) {
-				x_coordinate = 7;
-				y_coordinate = 2;
+			if (position == 0){
+				x_coordinate = 7 ;
+				y_coordinate = 4;
 			}
 			// Top right
 			else if (position == 1) {
 				x_coordinate = 27;
-				y_coordinate = 2;
+				y_coordinate = 4;
 			}
 			// Bottom left
-			else if (position == 2) {
+			else if (position == 2){
 				x_coordinate = 7;
-				y_coordinate = SCREEN_CHARACTER_HEIGHT / 2 + 1;
+				y_coordinate = SCREEN_CHARACTER_HEIGHT/2 + 3;
 			}
 			// Bottom right
-			else {
+			else{
 				x_coordinate = 27;
-				y_coordinate = SCREEN_CHARACTER_HEIGHT / 2 + 1;
+				y_coordinate = SCREEN_CHARACTER_HEIGHT/2 + 3;
 			}
 
-			alt_up_char_buffer_string(char_buffer, player_name, x_coordinate,
-					y_coordinate);
+			alt_up_char_buffer_string(char_buffer,player_name,x_coordinate,y_coordinate);
 			x_coordinate += 2;
 			y_coordinate += 2;
-			getPersonalScore(list, player_score, player_name);
-			for (i = 0; player_score[i] != -1; i++) {
-				sprintf(string_buffer, "%d", player_score[i]);
-				alt_up_char_buffer_string(char_buffer, string_buffer,
-						x_coordinate, y_coordinate);
+			getPersonalScore(list,player_score,player_name);
+			for (i = 0 ; player_score[i] != -1 ; i++){
+				convertInt(string_buffer,player_score[i]);
+				alt_up_char_buffer_string(char_buffer,string_buffer,x_coordinate,y_coordinate);
 				y_coordinate += 2;
 			}
 
@@ -706,35 +706,47 @@ void displayHighScore(char *player1, char *player2, char *player3,
 			position++;
 		}
 
+
 		// Print the highest score
-		alt_up_char_buffer_string(char_buffer, "Highest Score",
-				SCREEN_CHARACTER_WIDTH / 2 + 13, 0);
+		alt_up_char_buffer_string(char_buffer,"Highest Score",SCREEN_CHARACTER_WIDTH/2 + 13,1);
 
-		x_start = SCREEN_CHARACTER_WIDTH / 2 + 10;
+		x_start = SCREEN_CHARACTER_WIDTH /2 + 5;
 		x_coordinate = x_start;
-		y_coordinate = 0;
+		y_coordinate = 4;
 
-		y_coordinate = y_coordinate + 2;
-		getMax10Score(list, max_score);
-		for (i = 0; max_score[i].name[0] != '\0'; i++) {
-			tmp[0] = (char) ((int) '0' + i + 1);
-			tmp[1] = '\0';
-			alt_up_char_buffer_string(char_buffer, tmp, x_coordinate,
-					y_coordinate);
-			x_coordinate++;
-			alt_up_char_buffer_string(char_buffer, ".", x_coordinate,
-					y_coordinate);
-			x_coordinate += 2;
 
-			alt_up_char_buffer_string(char_buffer, max_score[i].name,
-					x_coordinate, y_coordinate);
-			x_coordinate += 10;
-			alt_up_char_buffer_string(char_buffer, max_score[i].score,
-					x_coordinate, y_coordinate);
+		y_coordinate=y_coordinate+2;
+		getMax10Score(list,max_score);
+		for (i = 0; max_score[i].name[0] != '\0' ; i++){
+				tmp[0] = (char)((int)'0'+i+1);
+				tmp[1] = '\0';
 
-			x_coordinate = x_start;
-			y_coordinate += 2;
+				if (i==9){
+					x_coordinate -= 1;
+					alt_up_char_buffer_string(char_buffer,"10",x_coordinate,y_coordinate);
+					x_coordinate += 2;
+				}
+				else{
+					alt_up_char_buffer_string(char_buffer,tmp,x_coordinate,y_coordinate);
+					x_coordinate++;
+				}
+				alt_up_char_buffer_string(char_buffer,".",x_coordinate,y_coordinate);
+				x_coordinate+=2;
+
+				alt_up_char_buffer_string(char_buffer,max_score[i].name,x_coordinate,y_coordinate);
+
+				x_coordinate+=strlen(max_score[i].name);
+				for (; x_coordinate < 75 ; x_coordinate++){
+					alt_up_char_buffer_string(char_buffer,".",x_coordinate,y_coordinate);
+				}
+
+				alt_up_char_buffer_string(char_buffer,max_score[i].score,x_coordinate,y_coordinate);
+
+				x_coordinate = x_start;
+				y_coordinate += 5;
 		}
 	}
 }
+
+
 

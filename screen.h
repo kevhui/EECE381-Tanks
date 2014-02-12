@@ -44,8 +44,8 @@ void drawTest(void);
 void drawHealth(int,int,int,int);
 void drawGas(int);
 void drawPower(int);
-//void drawBullet(int);
-//void drawWindIndicator(int);
+void drawBullet(int);
+void drawWindIndicator(int);
 
 void displayHighScore(char *,char *,char *,char *);
 

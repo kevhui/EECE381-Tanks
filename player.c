@@ -389,7 +389,7 @@ void fireBulletTwo(int turn, int power, int wind, int bulletType) {
 		for (bulletCount = 0; bulletCount < 8; bulletCount++) {
 			b.x = saved_x + rand()%(15*PIXEL_SCALE);
 			b.y = saved_y;
-			b.dx = rand()%(PIXEL_SCALE/2);
+			b.dx = rand()%(PIXEL_SCALE/3);
 			b.dx = b.dx%2 == 1 ? -b.dx : b.dx;
 			b.dy = saved_dy;
 			bullet_alive = ALIVE;
