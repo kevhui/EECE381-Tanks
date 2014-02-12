@@ -10,7 +10,7 @@
 char *display_string;//string to write to screen
 char player_name[10];//player name
 int count = 0;//count for player name
-int playersconfig;//number of players configured
+int playersconfig = 0;//number of players configured
 int playerCharacter;
 int playertype;
 int hp = 10;

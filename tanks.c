@@ -24,6 +24,7 @@
 #include "menu.h"
 #include "sys/alt_alarm.h"
 #include "sys/alt_timestamp.h"
+#include "audio.h"
 
 static void initKeyboard();//initializes keyboard
 void runGame();
@@ -43,6 +44,12 @@ KB_CODE_TYPE decode_mode;
 char ascii;
 alt_u8 buf[4];
 
+//audio variables
+aud_buf ab_1;
+aud_buf *ab = &ab_1;
+short int file_handle;
+char* fname = "clip.wav";
+
 //set some of these in player struct!!!//
 volatile int state = 0;//state of game
 
@@ -61,12 +68,32 @@ void GameOverScreen() {
 	initSD();
 	int i;
 	for (i = 0; i < numPlayers; ++i) {
-		if(p[pOne].name != NULL){
-		writeSD(p[i].name,1);
+		if(p[i].name != NULL){
+		char name[10];
+		strcpy(name,p[i].name);
+		writeSD(name,1);
 		printf("write %i\n",i);
 		}
 	}
-	displayHighScore(p[pOne].name,p[pTwo].name,p[pThree].name,p[pFour].name);
+
+	for(i=0; i < numPlayers; ++i){
+	printf("%s",p[i].name);
+	}
+
+	//displayHighScore("abc","a","b","c");
+	if(numPlayers == 2){
+		displayHighScore(p[pOne].name,p[pTwo].name,NULL,NULL);
+		printf("TWO");
+	}
+	else if(numPlayers==3){
+		displayHighScore(p[pOne].name,p[pTwo].name,p[pThree].name,NULL);
+		printf("THREE");
+	}
+	else{
+		displayHighScore(p[pOne].name,p[pTwo].name,p[pThree].name,p[pFour].name);
+		printf("ALL");
+	}
+
 //	printString("GAME OVER!", 30, 25);
 	usleep(10000000);
 	state = 0;
@@ -196,6 +223,27 @@ void initKeyboard() {
 	//IOWR(KEYBOARD_BASE, 1, 0x01); //not sure but jeff put this in his code
 }
 
+int initAudio(char* fname){
+	alt_up_sd_card_dev *device_reference = NULL;
+	device_reference = alt_up_sd_card_open_dev(SD_CARD_NAME);
+
+	open_sd();
+
+	av_config_setup();
+	init_audio_buff(ab);
+
+	ab->audio = alt_up_audio_open_dev(AUDIO_0_NAME);
+	alt_up_audio_reset_audio_core(ab->audio);
+
+	file_handle = alt_up_sd_card_fopen(fname, 0);
+	offset(file_handle, ab);
+
+	fill_buff(file_handle, ab);
+
+	return file_handle;
+}
+
+
 int main(void) {
 	while (1) {
 		int setTime = 15;
@@ -206,7 +254,9 @@ int main(void) {
 		clean_up();
 		initKeyboard();
 		initState0();
-
+		file_handle = initAudio(fname);
+		alt_irq_register(AUDIO_0_IRQ,&ab,(alt_isr_func)write_fifo);
+		alt_up_audio_enable_write_interrupt(ab->audio);
 
 		//This is for Isaac cause he doesnt have a keyboard
 		if (IORD(keys,0) == 8) {
@@ -238,6 +288,8 @@ int main(void) {
 
 		//Draw field and UI to both buffers
 		initField();
+
+
 		updateField();
 		drawName(p[pOne].name, p[pTwo].name, p[pThree].name, p[pFour].name);
 		drawGas(p[pOne].gas);
@@ -245,13 +297,13 @@ int main(void) {
 		drawBullet(0);
 		drawWindIndicator(1);
 		updateScreen();
+
 		updateField();
 		drawName(p[pOne].name, p[pTwo].name, p[pThree].name, p[pFour].name);
 		drawGas(p[pOne].gas);
 		drawHealth(p[pOne].hp, p[pTwo].hp, p[pThree].hp, p[pFour].hp);
 		drawBullet(0);
 		drawWindIndicator(1);
-		updateScreen();
 
 		float time;
 		alt_timestamp_start();
@@ -265,8 +317,14 @@ int main(void) {
 			}
 			runGame();
 			printTimer(setTime - time);
-
+//
+			loop_audio(file_handle, fname, ab);
+			runGame();
 		}
+		alt_up_ps2_disable_read_interrupt(ps2);
+		alt_up_audio_disable_write_interrupt(ab->audio);
+		alt_up_sd_card_fclose(file_handle);
+
 		alt_up_ps2_disable_read_interrupt(ps2);
 		GameOverScreen();
 		while (state == 3)
@@ -279,7 +337,6 @@ void runGame(void) {
 	undrawPlayers();
 	updateActions();
 	int i;
-
 
 
 	//printf("degree: %d \n",p[turn].deg);
@@ -299,7 +356,6 @@ void runGame(void) {
 	updateScreen();
 	usleep(1000);
 
-	//TODO: check all players
 	int deadCount = 0;
 	for (i = 0; i < numPlayers; i++) {
 		if (p[i].alive == DEAD)

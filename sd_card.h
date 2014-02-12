@@ -9,6 +9,8 @@
 #include <altera_up_sd_card_avalon_interface.h>
 #include <stdio.h>
 #include <system.h>
+#include <string.h>
+#include <stdlib.h>
 #define SCORE_BUFFER_SIZE 512
 #define MAX_CHARACTER_OF_NAME 50
 #define MAX_CHARACTER_OF_SCORE 3

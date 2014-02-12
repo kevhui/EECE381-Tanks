@@ -20,6 +20,7 @@ void generateField() {
 	int i, j, flag;
 
 	for (i = 0; i < SCREEN_WIDTH; i++) {
+		field[i] = SCREEN_HEIGHT * 7 / 10;
 		flag = 0;
 		for (j = 0; j < SCREEN_HEIGHT; j++) {
 			//Using white as a mask
