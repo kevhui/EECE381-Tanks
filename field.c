@@ -16,6 +16,28 @@ void initField() {
 
 //TODO: Make a field generator
 //Generates a field
+/*void generateField() {
+	int i, j, flag;
+
+	for (i = 0; i < SCREEN_WIDTH; i++) {
+		//field[i] = SCREEN_HEIGHT * 7 / 10;
+		flag = 0;
+		for (j = 0; j < SCREEN_HEIGHT; j++) {
+			if (flag == 1) {
+				map[j][i] = hyrule[j][i];
+			} else {
+				map[j][i] = NOTHING;
+			}
+			if (hyrule[j][i] != 0xFFFF && flag == 0) {
+				field[i] = j - 2;
+				map[j - 1][i] = NOTHING;
+				flag = 1;
+			}
+		}
+	}
+
+}*/
+
 void generateField() {
 	int i, j, flag;
 

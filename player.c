@@ -8,6 +8,7 @@
 #include "player.h"
 
 void initPlayer(int id, int character, char *name, int hp, int gas, int type) {
+	printf("type: %i",type);
 	switch (id) {
 	case pOne:
 		p[id].x = 50;
@@ -479,6 +480,10 @@ int getHitPlayer(int x, int y, int hitBoxLength) {
 					+ hitBoxLength && y > p[i].y - hitBoxLength && y < p[i].y
 					+ TANK_HEIGHT + hitBoxLength) {
 				printf("hit player %i!\n", i);
+				if((p[turn].type == COMPUTER) && (i == turn)){
+					printf("hit itself");
+					return 0;
+				}
 				return 1;
 			}
 		}

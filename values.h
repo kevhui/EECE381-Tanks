@@ -3,8 +3,6 @@
 
 #include <system.h>
 
-#define TRUE 1
-#define FALSE 0
 #define GRAVITY -15
 #define PIXEL_SCALE 500
 #define SCREEN_WIDTH 320
@@ -42,6 +40,18 @@
 #define SCREEN_CHARACTER_HEIGHT 60
 #define ALIVE 1
 #define DEAD 0
+#define TRUE 1
+#define FALSE 0
+
+typedef struct ai {
+	int target;
+	int hasTarget;
+	int turnLock;
+	int checkNum;
+	int closest[2];
+	int isHit;
+	int hitBy;
+} ai;
 
 typedef struct player {
 	int x;
@@ -60,7 +70,11 @@ typedef struct player {
 	int type;
 	int power;
 	int isFalling;
+	int moved;
+	ai ai;
 } player;
+
+
 
 struct bullet {
 	int x;

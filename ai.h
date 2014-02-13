@@ -22,11 +22,14 @@ extern int numPlayers;
 extern int turn;
 int peaks[2];
 
-void ai(void);
+void aiMain(int);
 int findClosest(void);
 int pythag(int);
 int findPeak(int);
 void testFire(int);
-void aiFire(int, int, int, int);
+int targetDir(int);
+int aiFire(int, int, int, int);
+void aiMove(int);
+int bPythag(int, int, int);
 
 #endif

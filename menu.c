@@ -20,54 +20,60 @@ int bullet_guide = 0;
 int big_exp = 0;
 int cursor = 0;
 
-void initState0(){
+void initState0() {
 	playersconfig = 0;
-	  initScreen();
-	  clearCharBuffer();
-	  clearScreen();
-	  printString("TANKS", 36, 10);
-	  printString("NUMBER OF PLAYERS:", 10, 20);
-	  printString("_2", 28, 20);
-	  printString("HEALTH POINTS:",10,24);
-	  printString("10",25,24);
-	  printString("GAS:",10,28);
-	  printString("25",15,28);
-	  printString("WIND:",10,32);
-	  printString("LIGHT",16,32);
-	  printString("BULLET GUIDE:",10,36);
-	  printString("OFF",24,36);
-	  printString("BIG EXPLOSIONS:",10,40);
-	  printString("OFF",26,40);
 
-	  printString("PRESS SPACE", 33, 50);
-	  printString("CONTROLS:", 45, 20);
-	  printString("LEFT AND RIGHT ARROW : MOVE TANK", 45, 24);
-	  printString("UP AND DOWN ARROW : TILT GUN",45, 28);
-	  printString("PGUP AND PGDOWN : CHANGE POWER",45, 32);
-	  printString("W : CHANGE WEAPON",45, 36);
-	  printString("SPACE : FIRE",45, 40);
-	  updateScreen();
+	initScreen();
+	clearCharBuffer();
+	clearScreen();
+	printString("TANKS", 36, 10);
+	printString("NUMBER OF PLAYERS:", 10, 20);
+	printString("_2", 28, 20);
+	printString("HEALTH POINTS:", 10, 24);
+	printString("10", 25, 24);
+	printString("GAS:", 10, 28);
+	printString("25", 15, 28);
+	printString("WIND:", 10, 32);
+	printString("LIGHT", 16, 32);
+	printString("BULLET GUIDE:", 10, 36);
+	printString("OFF", 24, 36);
+	printString("BIG EXPLOSIONS:", 10, 40);
+	printString("OFF", 26, 40);
+
+	printString("PRESS SPACE", 33, 50);
+	printString("CONTROLS:", 45, 20);
+	printString("LEFT AND RIGHT ARROW : MOVE TANK", 45, 24);
+	printString("UP AND DOWN ARROW : TILT GUN", 45, 28);
+	printString("PGUP AND PGDOWN : CHANGE POWER", 45, 32);
+	printString("W : CHANGE WEAPON", 45, 36);
+	printString("SPACE : FIRE", 45, 40);
+	updateScreen();
 }
 
-void initState1(int playernum){
-		  clearCharBuffer();
-		  clearScreen();
-		  printString("TANKS", 36, 10);
-		  printString("Player #", 33, 14);
-		  if (playernum==pOne) printString("1",42,14);
-		  else if (playernum==pTwo) printString("2",42,14);
-		  else if (playernum==pThree) printString("3",42,14);
-		  else if (playernum==pFour) printString("4",42,14);
-		  //print player number
-		  printString("ENTER NAME:_",14,20);
-		  printString("CHANGE COLOR: ",14,24);
-		  printString("MARIO",28,24);//default
-		  //print player color
-		  printString("SELECT PLAYER TYPE: ", 14, 28);
-		  printString("COMP",34,28);//default
-		  //print player type
-		  printString("PRESS SPACE TO START", 25, 50);
-		  updateScreen();
+void initState1(int playernum) {
+	clearCharBuffer();
+	clearScreen();
+	playertype = COMPUTER;
+	printString("TANKS", 36, 10);
+	printString("Player #", 33, 14);
+	if (playernum == pOne)
+		printString("1", 42, 14);
+	else if (playernum == pTwo)
+		printString("2", 42, 14);
+	else if (playernum == pThree)
+		printString("3", 42, 14);
+	else if (playernum == pFour)
+		printString("4", 42, 14);
+	//print player number
+	printString("ENTER NAME:_", 14, 20);
+	printString("CHANGE COLOR: ", 14, 24);
+	printString("MARIO", 28, 24);//default
+	//print player color
+	printString("SELECT PLAYER TYPE: ", 14, 28);
+	printString("COMP", 34, 28);//default
+	//print player type
+	printString("PRESS SPACE TO START", 25, 50);
+	updateScreen();
 }
 
 void state_0(int decode_mode, alt_8 buf) {
@@ -80,9 +86,9 @@ void state_0(int decode_mode, alt_8 buf) {
 				if (numPlayers > 2)
 					numPlayers -= 1;
 				updateNumPlayers();
-//				snprintf(display_string, sizeof(display_string), "%d",
-//						numPlayers);
-//				AdjustChar(display_string, 29, 20);
+				//				snprintf(display_string, sizeof(display_string), "%d",
+				//						numPlayers);
+				//				AdjustChar(display_string, 29, 20);
 			} else if (cursor == 1) {//on health points
 				if (hp > 10)
 					hp -= 10;
@@ -130,10 +136,10 @@ void state_0(int decode_mode, alt_8 buf) {
 			if (cursor == 0) {
 				if (numPlayers < 4)
 					numPlayers += 1;
-					updateNumPlayers();
-/*				snprintf(display_string, sizeof(display_string), "%d",
-						numPlayers);
-				AdjustChar(display_string, 29, 20);*/
+				updateNumPlayers();
+				/*				snprintf(display_string, sizeof(display_string), "%d",
+				 numPlayers);
+				 AdjustChar(display_string, 29, 20);*/
 			} else if (cursor == 1) {//on health points
 				if (hp < 100)
 					hp += 10;
@@ -227,14 +233,13 @@ void state_1(int decode_mode, alt_8 buf, char ascii) {
 		if (buf == SPACEBAR) {
 			//TODO: make an options menu to adust hp
 			//printf("playerCharacter %i",playerCharacter);
-			if (playersconfig < numPlayers-1) {
-				if (count > 0){
-				initPlayer(playersconfig, playerCharacter, player_name,
-						hp,gas,playertype);
-				}
-				else{
-				initPlayer(playersconfig, playerCharacter, "Guest",
-						hp,gas,playertype);
+			if (playersconfig < numPlayers - 1) {
+				if (count > 0) {
+					initPlayer(playersconfig, playerCharacter, player_name, hp,
+							gas, playertype);
+				} else {
+					initPlayer(playersconfig, playerCharacter, "Guest", hp,
+							gas, playertype);
 				}
 				clearPlayerName();
 				playersconfig++;//this corresponds to the player ID
@@ -242,21 +247,20 @@ void state_1(int decode_mode, alt_8 buf, char ascii) {
 				count = 0;
 				initState1(playersconfig);
 			} else {
-				if (count > 0){
-				initPlayer(playersconfig, playerCharacter, player_name,
-						hp,gas,playertype);
-				}
-				else{
-				initPlayer(playersconfig, playerCharacter, "Guest",
-						hp,gas,playertype);
+				if (count > 0) {
+					initPlayer(playersconfig, playerCharacter, player_name, hp,
+							gas, playertype);
+				} else {
+					initPlayer(playersconfig, playerCharacter, "Guest", hp,
+							gas, playertype);
 				}
 				state = 2;
-				if(numPlayers == 2){
-					initPlayer(pThree, MARIO, NULL,hp,gas,HUMAN);
-					initPlayer(pFour, MARIO, NULL,hp,gas,HUMAN);
+				if (numPlayers == 2) {
+					initPlayer(pThree, MARIO, NULL, hp, gas, HUMAN);
+					initPlayer(pFour, MARIO, NULL, hp, gas, HUMAN);
 				}
-				if(numPlayers == 3){
-					initPlayer(pFour, MARIO,NULL,hp,gas,HUMAN);
+				if (numPlayers == 3) {
+					initPlayer(pFour, MARIO, NULL, hp, gas, HUMAN);
 				}
 			}
 		} else if (buf == BACKSPACE) {//back space
@@ -281,11 +285,11 @@ void state_1(int decode_mode, alt_8 buf, char ascii) {
 				}
 			}
 			if (cursor == 2) {
-				if (playertype == 0) {
-					playertype = 1;
-					AdjustChar("REAL", 34, 28);
+				if (playertype == COMPUTER) {
+					playertype = HUMAN;
+					AdjustChar("HUMAN", 34, 28);
 				} else {
-					playertype = 0;
+					playertype = COMPUTER;
 					AdjustChar("COMP", 34, 28);
 				}
 			}
@@ -301,11 +305,11 @@ void state_1(int decode_mode, alt_8 buf, char ascii) {
 				}
 			}
 			if (cursor == 2) {
-				if (playertype == 0) {
-					playertype = 1;
-					AdjustChar("REAL", 34, 28);
+				if (playertype == COMPUTER) {
+					playertype = HUMAN;
+					AdjustChar("HUMAN", 34, 28);
 				} else {
-					playertype = 0;
+					playertype = COMPUTER;
 					AdjustChar("COMP", 34, 28);
 				}
 			}

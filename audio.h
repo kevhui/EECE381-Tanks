@@ -17,7 +17,7 @@
 #include "system.h"
 
 
-#define MAX_BUFFER_SIZE 9600
+#define MAX_BUFFER_SIZE 480
 
 typedef struct{
 	unsigned int buf[MAX_BUFFER_SIZE];
@@ -27,6 +27,12 @@ typedef struct{
 
 	alt_up_audio_dev *audio;
 } aud_buf;
+
+//audio variables
+extern aud_buf ab_1;
+extern aud_buf *ab;
+extern short int file_handle;
+extern char* fname;
 
 void av_config_setup();
 void open_sd(void);

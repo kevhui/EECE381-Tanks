@@ -50,6 +50,8 @@ int fill_buff(short int fileHandle, aud_buf *ab){
 
 	//printf("Fill buff\n");
 
+
+
 	for (i = 0; i < audio_size; i++) {
 		a = alt_up_sd_card_read(fileHandle);
 		if(a < 0){
@@ -74,12 +76,12 @@ void write_fifo(void* context, unsigned int id){
 	aud_buf *ab = *(aud_buf**)context;
 	int start = ab->start;
 
-	while (1) {
-		int space = alt_up_audio_write_fifo_space(ab->audio, ALT_UP_AUDIO_LEFT);
-		//printf("Space:%d\n", space);
-		if (space >= 96)
-			break;
-	}
+//	while (1) {
+//		int space = alt_up_audio_write_fifo_space(ab->audio, ALT_UP_AUDIO_LEFT);
+//		//printf("Space:%d\n", space);
+//		if (space >= 96)
+//			break;
+//	}
 	alt_up_audio_write_fifo(ab->audio, (unsigned int*) ab->buf + start, 96, ALT_UP_AUDIO_LEFT);
 	alt_up_audio_write_fifo(ab->audio, (unsigned int*) ab->buf + start, 96, ALT_UP_AUDIO_RIGHT);
 

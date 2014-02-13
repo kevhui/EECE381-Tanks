@@ -148,7 +148,8 @@ int getAllScore(score list[]) {
 			//word = alt_up_sd_card_read(handler);
 			//word = alt_up_sd_card_read(handler);
 			word = alt_up_sd_card_read(handler);
-			j++; // move to next player
+			if (!(list[j].name[0]=='\0'||list[j].score[0]=='\0'))
+				j++; // move to next player
 			i = 0;
 		}
 		// otherwise, save the name
@@ -236,8 +237,10 @@ int getPersonalScore(score list[], int player_score[], char* name) {
 			j++;
 		}
 	}
-	if (j == 0)
-		return 0;
+	if (j == 0){
+		player_score[j] = -1;
+		return -1;
+	}
 	qsort(tmp, j, sizeof(int), cmp_func);
 	for (i = 0; i < 10 && i < j; i++)
 		player_score[i] = tmp[i];

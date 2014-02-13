@@ -26,11 +26,17 @@
 #include "sys/alt_timestamp.h"
 #include "audio.h"
 #include "system.h"
+#include "ai.h"
 
 static void initKeyboard();//initializes keyboard
 void runGame();
 void setPlayerTurn();
 void updateActions();
+
+aud_buf ab_1;
+aud_buf *ab = &ab_1;
+short int file_handle;
+char* fname = "clip.wav";
 
 int windPower = 0;
 struct player p[3];
@@ -45,12 +51,6 @@ KB_CODE_TYPE decode_mode;
 char ascii;
 alt_u8 buf[4];
 
-//audio variables
-aud_buf ab_1;
-aud_buf *ab = &ab_1;
-short int file_handle;
-char* fname = "brawl.wav";
-
 //set some of these in player struct!!!//
 volatile int state = 0;//state of game
 
@@ -64,38 +64,54 @@ int fpDown = 0;
 
 void GameOverScreen() {
 	clearScreen();
-	updateScreen();
+	//updateScreen();
 	clearCharBuffer();
+
 	initSD();
 	int i;
 	for (i = 0; i < numPlayers; ++i) {
-		if(p[i].name != NULL){
-		char name[10];
-		strcpy(name,p[i].name);
-		writeSD(name,1);
-		printf("write %i\n",i);
+		if (p[i].name != NULL) {
+			char name[10];
+			strcpy(name, p[i].name);
+			writeSD(name, 1);
+			printf("write %i\n", i);
 		}
 	}
 
-	for(i=0; i < numPlayers; ++i){
-	printf("%s",p[i].name);
+	for (i = 0; i < numPlayers; ++i) {
+		printf("%s", p[i].name);
 	}
 
+	clearScreen();
 	//displayHighScore("abc","a","b","c");
-	if(numPlayers == 2){
-		displayHighScore(p[pOne].name,p[pTwo].name,NULL,NULL);
+	if (numPlayers == 2) {
+		displayHighScore(p[pOne].name, p[pTwo].name, NULL, NULL);
 		printf("TWO");
-	}
-	else if(numPlayers==3){
-		displayHighScore(p[pOne].name,p[pTwo].name,p[pThree].name,NULL);
+	} else if (numPlayers == 3) {
+		displayHighScore(p[pOne].name, p[pTwo].name, p[pThree].name, NULL);
 		printf("THREE");
-	}
-	else{
-		displayHighScore(p[pOne].name,p[pTwo].name,p[pThree].name,p[pFour].name);
+	} else {
+		displayHighScore(p[pOne].name, p[pTwo].name, p[pThree].name,
+				p[pFour].name);
 		printf("ALL");
 	}
+	updateScreen();
+	clearScreen();
 
-//	printString("GAME OVER!", 30, 25);
+	if (numPlayers == 2) {
+		displayHighScore(p[pOne].name, p[pTwo].name, NULL, NULL);
+		printf("TWO");
+	} else if (numPlayers == 3) {
+		displayHighScore(p[pOne].name, p[pTwo].name, p[pThree].name, NULL);
+		printf("THREE");
+	} else {
+		displayHighScore(p[pOne].name, p[pTwo].name, p[pThree].name,
+				p[pFour].name);
+		printf("ALL");
+	}
+	updateScreen();
+
+	//printString("GAME OVER!", 30, 25);
 	usleep(10000000);
 	state = 0;
 }
@@ -224,7 +240,7 @@ void initKeyboard() {
 	//IOWR(KEYBOARD_BASE, 1, 0x01); //not sure but jeff put this in his code
 }
 
-int initAudio(char* fname){
+int initAudio(char* fname) {
 	alt_up_sd_card_dev *device_reference = NULL;
 	device_reference = alt_up_sd_card_open_dev(SD_CARD_NAME);
 
@@ -244,9 +260,16 @@ int initAudio(char* fname){
 	return file_handle;
 }
 
+void initAI() {
+	int i;
+	for (i = 0; i < numPlayers; i++) {
+		p[i].ai.isHit = FALSE;
+	}
+}
 
 int main(void) {
 	while (1) {
+		state = 0;
 		int setTime = 15;
 		numPlayers = 2;
 		initScreen();
@@ -256,24 +279,27 @@ int main(void) {
 		initKeyboard();
 		initState0();
 		file_handle = initAudio(fname);
-		alt_irq_register(AUDIO_0_IRQ,&ab,(alt_isr_func)write_fifo);
+		alt_irq_register(AUDIO_0_IRQ, &ab, (alt_isr_func) write_fifo);
 		alt_up_audio_enable_write_interrupt(ab->audio);
 
 		//This is for Isaac cause he doesnt have a keyboard
 		if (IORD(keys,0) == 8) {
-			initPlayer(pOne, MARIO, "pOne", 50,100,HUMAN);
-			initPlayer(pTwo, LUIGI, "pTwo", 50,100,HUMAN);
+			initPlayer(pOne, MARIO, "pOne", 50, 100, HUMAN);
+			initPlayer(pTwo, LUIGI, "pTwo", 50, 100, COMPUTER);
 			state = 2;
 		} else {
 			while (state == 0) {
 				decode_scancode(ps2, &decode_mode, buf, &ascii);
 				state_0(decode_mode, buf[0]);
+				loop_audio(file_handle, fname, ab);
+
 			};
 
 			initState1(pOne);
 			while (state == 1) {
 				decode_scancode(ps2, &decode_mode, buf, &ascii);
 				state_1(decode_mode, buf[0], ascii);
+				loop_audio(file_handle, fname, ab);
 			};
 		}
 
@@ -290,7 +316,6 @@ int main(void) {
 		//Draw field and UI to both buffers
 		initField();
 
-
 		updateField();
 		drawName(p[pOne].name, p[pTwo].name, p[pThree].name, p[pFour].name);
 		drawGas(p[pOne].gas);
@@ -306,28 +331,64 @@ int main(void) {
 		drawBullet(0);
 		drawWindIndicator(1);
 
+		initAI();
+
 		float time;
 		alt_timestamp_start();
 
 		start_time = (float) alt_timestamp() / (float) alt_timestamp_freq();
 		printf("NUM PLAYERA %i\n", numPlayers);
+		int i;
 		while (state == 2) {
-			time = (float) alt_timestamp() / (float) alt_timestamp_freq()- start_time;
-			if(time >= setTime){
+			int fallFlag = 1;
+
+			while (fallFlag == 1) {
+				fallFlag = 0;
+				for (i = 0; i < numPlayers; i++) {
+					if (p[i].isFalling && p[i].alive) {
+						if(fallFlag==0){
+							undrawPlayers();
+						}
+						fallFlag = 1;
+						checkPlayerFalling(i);
+					}
+					updatePlayer(i);
+				}
+				if(fallFlag == 1){
+				updateScreen();
+				}
+			}
+
+			time = (float) alt_timestamp() / (float) alt_timestamp_freq()
+					- start_time;
+			if (time >= setTime) {
 				setPlayerTurn();
 			}
-			runGame();
+			if (p[turn].type == HUMAN) {
+				runGame();
+
+			} else {
+				p[turn].deg = 0;
+				aiMain(turn);
+				setPlayerTurn();
+			}
 			printTimer(setTime - time);
-			loop_audio(file_handle, fname, ab);
+			int deadCount = 0;
+			for (i = 0; i < numPlayers; i++) {
+				if (p[i].alive == DEAD)
+					deadCount++;
+			}
+			if (deadCount == numPlayers - 1) {
+				usleep(500000);
+				state = 3;
+			}
 		}
+
+
 		alt_up_ps2_disable_read_interrupt(ps2);
 		alt_up_audio_disable_write_interrupt(ab->audio);
-		alt_up_sd_card_fclose(file_handle);
 
 		GameOverScreen();
-		while (state == 3)
-			;
-
 	}
 }
 
@@ -336,31 +397,22 @@ void runGame(void) {
 	updateActions();
 	int i;
 
-
 	//printf("degree: %d \n",p[turn].deg);
 
 	//clearScreen();
 	//updateField();
 
-	for (i = 0; i < numPlayers; ++i) {
-		if (p[i].alive) {
-			checkPlayerFalling(i);
-			updatePlayer(i);
-		}
+	for (i = 0; i < numPlayers; i++) {
+		updatePlayer(i);
 	}
+
 	drawGas(p[turn].gas);
 	drawPower(p[turn].power);
 	updateScreen();
+
 	//usleep(1000);
-	int deadCount = 0;
-	for (i = 0; i < numPlayers; i++) {
-		if (p[i].alive == DEAD)
-			deadCount++;
-	}
-	if (deadCount == numPlayers - 1) {
-		usleep(500000);
-		state = 3;
-	}
+
+
 }
 
 void setPlayerTurn() {
@@ -379,10 +431,12 @@ void updateActions() {
 
 	if (IORD(keys,0) == 8) {
 		moveLeft(turn);
+		p[turn].moved = TRUE;
 	}
 	//moves right
 	if (IORD(keys,0) == 4) {
 		moveRight(turn);
+		p[turn].moved = TRUE;
 	}
 	//turret fire
 	if (IORD(keys,0) == 2) {
@@ -404,9 +458,11 @@ void updateActions() {
 	}
 
 	if (fLeft == 1) {
+		p[turn].moved = TRUE;
 		moveLeft(turn);
 	}
 	if (fRight == 1) {
+		p[turn].moved = TRUE;
 		moveRight(turn);
 	}
 	if (fUp == 1) {
@@ -424,20 +480,20 @@ void updateActions() {
 			p[turn].power++;
 	}
 	if (fFire == 1) {
-		if(!p[turn].isFalling){
-		alt_up_ps2_disable_read_interrupt(ps2);
-		turretFire(turn, p[turn].power, windPower, 0);
-		setPlayerTurn();
-		alt_up_ps2_enable_read_interrupt(ps2);
-		printf("Before enabled interupt\n");
-		alt_up_ps2_clear_fifo(ps2);
-		printf("Fifo cleared\n");
-		fFire = 0;
-		drawHealth(p[pOne].hp, p[pTwo].hp, p[pThree].hp, p[pFour].hp);
-		drawBullet(0);
-		drawWindIndicator(1);
-		updateScreen();
-		drawHealth(p[pOne].hp, p[pTwo].hp, p[pThree].hp, p[pFour].hp);
+		if (!p[turn].isFalling) {
+			alt_up_ps2_disable_read_interrupt(ps2);
+			turretFire(turn, p[turn].power, windPower, 0);
+			setPlayerTurn();
+			alt_up_ps2_enable_read_interrupt(ps2);
+			printf("Before enabled interupt\n");
+			alt_up_ps2_clear_fifo(ps2);
+			printf("Fifo cleared\n");
+			fFire = 0;
+			drawHealth(p[pOne].hp, p[pTwo].hp, p[pThree].hp, p[pFour].hp);
+			drawBullet(0);
+			drawWindIndicator(1);
+			updateScreen();
+			drawHealth(p[pOne].hp, p[pTwo].hp, p[pThree].hp, p[pFour].hp);
 		}
 	}
 }
