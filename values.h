@@ -3,8 +3,8 @@
 
 #include <system.h>
 
-#define GRAVITY -15
-#define PIXEL_SCALE 500
+#define GRAVITY -35
+#define PIXEL_SCALE 250
 #define SCREEN_WIDTH 320
 #define SCREEN_HEIGHT 240
 #define keys (volatile char *) PARALLEL_PORT_BASE
@@ -51,6 +51,9 @@ typedef struct ai {
 	int closest[2];
 	int isHit;
 	int hitBy;
+	int fire;
+	int offset;
+	int offshoot;
 } ai;
 
 typedef struct player {
@@ -71,6 +74,7 @@ typedef struct player {
 	int power;
 	int isFalling;
 	int moved;
+	int bulletType;
 	ai ai;
 } player;
 

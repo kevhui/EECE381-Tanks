@@ -26,7 +26,8 @@ void initScreen(void); //Initialise screen
 void initCharBuffer(void); //Initialise char buffer
 void clearScreen(void); //Clears screen
 void updateScreen(void); //Swaps buffers
-void undrawPlayers(void); //updates the players
+void undrawPlayers(void); //undraws all players
+void undrawPlayer(int); //undraw a players
 void undrawBullet(int,int);
 void updateField(void); //updates the field
 void updatePlayer(int); //updates the players

@@ -7,16 +7,17 @@
 
 #include "menu.h"
 
+
 char *display_string;//string to write to screen
 char player_name[10];//player name
 int count = 0;//count for player name
 int playersconfig = 0;//number of players configured
 int playerCharacter;
 int playertype;
-int hp = 10;
+int hp = 50;
 int gas = 25;
 //int wind=0;//initialize to light
-int bullet_guide = 0;
+int audio_on = 0;
 int big_exp = 0;
 int cursor = 0;
 
@@ -30,22 +31,22 @@ void initState0() {
 	printString("NUMBER OF PLAYERS:", 10, 20);
 	printString("_2", 28, 20);
 	printString("HEALTH POINTS:", 10, 24);
-	printString("10", 25, 24);
+	printString("50", 25, 24);
 	printString("GAS:", 10, 28);
 	printString("25", 15, 28);
-	printString("WIND:", 10, 32);
-	printString("LIGHT", 16, 32);
-	printString("BULLET GUIDE:", 10, 36);
-	printString("OFF", 24, 36);
-	printString("BIG EXPLOSIONS:", 10, 40);
-	printString("OFF", 26, 40);
+/*	printString("WIND:", 10, 32);
+	printString("LIGHT", 16, 32);*/
+	printString("AUDIO:", 10, 32);
+	printString("OFF", 17, 32);
+//	printString("BIG EXPLOSIONS:", 10, 40);
+//	printString("OFF", 26, 40);
 
 	printString("PRESS SPACE", 33, 50);
 	printString("CONTROLS:", 45, 20);
 	printString("LEFT AND RIGHT ARROW : MOVE TANK", 45, 24);
 	printString("UP AND DOWN ARROW : TILT GUN", 45, 28);
 	printString("PGUP AND PGDOWN : CHANGE POWER", 45, 32);
-	printString("W : CHANGE WEAPON", 45, 36);
+	printString("Q : CHANGE WEAPON", 45, 36);
 	printString("SPACE : FIRE", 45, 40);
 	updateScreen();
 }
@@ -70,7 +71,7 @@ void initState1(int playernum) {
 	printString("MARIO", 28, 24);//default
 	//print player color
 	printString("SELECT PLAYER TYPE: ", 14, 28);
-	printString("COMP", 34, 28);//default
+	printString("COMP ", 34, 28);//default
 	//print player type
 	printString("PRESS SPACE TO START", 25, 50);
 	updateScreen();
@@ -80,6 +81,7 @@ void state_0(int decode_mode, alt_8 buf) {
 	if (decode_mode == KB_BINARY_MAKE_CODE && buf == SPACEBAR) {
 		cursor = 0;
 		state = 1;
+		aOn = audio_on;
 	} else if (decode_mode == KB_LONG_BINARY_MAKE_CODE) {
 		if (buf == LEFT_ARROW) {
 			if (cursor == 0) {//on # of players
@@ -90,7 +92,7 @@ void state_0(int decode_mode, alt_8 buf) {
 				//						numPlayers);
 				//				AdjustChar(display_string, 29, 20);
 			} else if (cursor == 1) {//on health points
-				if (hp > 10)
+				if (hp > 50)
 					hp -= 10;
 				snprintf(display_string, sizeof(display_string), "%d", hp);
 				AdjustChar(display_string, 25, 24);
@@ -101,9 +103,10 @@ void state_0(int decode_mode, alt_8 buf) {
 					gas -= 5;
 				snprintf(display_string, sizeof(display_string), "%d", gas);
 				AdjustChar(display_string, 15, 28);
-				if (gas < 10)
-					AdjustChar(" ", 16, 28);
-			} else if (cursor == 3) {
+				if (gas < 100)
+					AdjustChar(" ", 17, 28);
+			}
+			/*else if (cursor == 3) {
 				if (windPower == 0) {
 					windPower = 1;
 					AdjustChar("STRONG", 16, 32);
@@ -112,16 +115,18 @@ void state_0(int decode_mode, alt_8 buf) {
 					AdjustChar("LIGHT", 16, 32);
 					AdjustChar(" ", 21, 32);
 				}
-			} else if (cursor == 4) {
-				if (bullet_guide == 0) {
-					bullet_guide = 1;
-					AdjustChar("ON", 24, 36);
-					AdjustChar(" ", 26, 36);
-				} else if (bullet_guide == 1) {
-					bullet_guide = 0;
-					AdjustChar("OFF", 24, 36);
+			}*/
+			else if (cursor == 3) {
+				if (audio_on == 0) {
+					audio_on = 1;
+					AdjustChar("ON", 17, 32);
+					AdjustChar(" ", 19, 32);
+				} else if (audio_on == 1) {
+					audio_on = 0;
+					AdjustChar("OFF", 17, 32);
 				}
-			} else if (cursor == 5) {
+			}
+			/*else if (cursor == 5) {
 				if (big_exp == 0) {
 					big_exp = 1;
 					AdjustChar("ON", 26, 40);
@@ -130,7 +135,7 @@ void state_0(int decode_mode, alt_8 buf) {
 					big_exp = 0;
 					AdjustChar("OFF", 26, 40);
 				}
-			}
+			}*/
 		}
 		if (buf == RIGHT_ARROW) {
 			if (cursor == 0) {
@@ -150,7 +155,8 @@ void state_0(int decode_mode, alt_8 buf) {
 					gas += 5;
 				snprintf(display_string, sizeof(display_string), "%d", gas);
 				AdjustChar(display_string, 15, 28);
-			} else if (cursor == 3) {
+			}
+			/*else if (cursor == 3) {
 				if (windPower == 0) {
 					windPower = 1;
 					AdjustChar("STRONG", 16, 32);
@@ -159,16 +165,18 @@ void state_0(int decode_mode, alt_8 buf) {
 					AdjustChar("LIGHT", 16, 32);
 					AdjustChar(" ", 21, 32);
 				}
-			} else if (cursor == 4) {
-				if (bullet_guide == 0) {
-					bullet_guide = 1;
-					AdjustChar("ON", 24, 36);
-					AdjustChar(" ", 26, 36);
-				} else if (bullet_guide == 1) {
-					bullet_guide = 0;
-					AdjustChar("OFF", 24, 36);
+			}*/
+			else if (cursor == 3) {
+				if (audio_on == 0) {
+					audio_on = 1;
+					AdjustChar("ON", 17, 32);
+					AdjustChar(" ", 19, 32);
+				} else if (audio_on == 1) {
+					audio_on = 0;
+					AdjustChar("OFF", 17, 32);
 				}
-			} else if (cursor == 5) {
+			}
+/*			else if (cursor == 5) {
 				if (big_exp == 0) {
 					big_exp = 1;
 					AdjustChar("ON", 26, 40);
@@ -177,7 +185,7 @@ void state_0(int decode_mode, alt_8 buf) {
 					big_exp = 0;
 					AdjustChar("OFF", 26, 40);
 				}
-			}
+			}*/
 		}
 		if (buf == UP_ARROW) {
 			if (cursor > 0) {
@@ -191,17 +199,19 @@ void state_0(int decode_mode, alt_8 buf) {
 				AdjustChar(" ", 14, 28);
 			} else if (cursor == 2) {
 				AdjustChar("_", 14, 28);
-				AdjustChar(" ", 15, 32);
-			} else if (cursor == 3) {
+				AdjustChar(" ", 16, 32);
+			}
+/*			else if (cursor == 3) {
 				AdjustChar("_", 15, 32);
 				AdjustChar(" ", 23, 36);
-			} else if (cursor == 4) {
-				AdjustChar("_", 23, 36);
-				AdjustChar(" ", 25, 40);
-			}
+			}*/
+//			 else if (cursor == 4) {
+//				AdjustChar("_", 23, 36);
+//				AdjustChar(" ", 25, 40);
+//			}
 		}
 		if (buf == DOWN_ARROW) {
-			if (cursor < 5) {
+			if (cursor < 3) {
 				cursor += 1;
 			}
 			if (cursor == 1) {
@@ -211,15 +221,19 @@ void state_0(int decode_mode, alt_8 buf) {
 				AdjustChar("_", 14, 28);
 				AdjustChar(" ", 24, 24);
 			} else if (cursor == 3) {
-				AdjustChar("_", 15, 32);
+				AdjustChar("_", 16, 32);
 				AdjustChar(" ", 14, 28);
-			} else if (cursor == 4) {
-				AdjustChar("_", 23, 36);
-				AdjustChar(" ", 15, 32);
-			} else if (cursor == 5) {
-				AdjustChar("_", 25, 40);
-				AdjustChar(" ", 23, 36);
 			}
+/*
+			else if (cursor == 4) {
+				AdjustChar("_", 16, 36);
+				AdjustChar(" ", 15, 32);
+			}
+*/
+//			 else if (cursor == 5) {
+//				AdjustChar("_", 25, 40);
+//				AdjustChar(" ", 23, 36);
+//			}
 		}
 	}
 }
@@ -231,9 +245,11 @@ void state_1(int decode_mode, alt_8 buf, char ascii) {
 
 	else if (decode_mode == KB_BINARY_MAKE_CODE) {
 		if (buf == SPACEBAR) {
+			printf("SPACE HIT");
 			//TODO: make an options menu to adust hp
 			//printf("playerCharacter %i",playerCharacter);
 			if (playersconfig < numPlayers - 1) {
+				printf("first");
 				if (count > 0) {
 					initPlayer(playersconfig, playerCharacter, player_name, hp,
 							gas, playertype);
@@ -247,6 +263,7 @@ void state_1(int decode_mode, alt_8 buf, char ascii) {
 				count = 0;
 				initState1(playersconfig);
 			} else {
+				printf("about to change to game state");
 				if (count > 0) {
 					initPlayer(playersconfig, playerCharacter, player_name, hp,
 							gas, playertype);
@@ -290,7 +307,7 @@ void state_1(int decode_mode, alt_8 buf, char ascii) {
 					AdjustChar("HUMAN", 34, 28);
 				} else {
 					playertype = COMPUTER;
-					AdjustChar("COMP", 34, 28);
+					AdjustChar("COMP ", 34, 28);
 				}
 			}
 			break;
@@ -310,7 +327,7 @@ void state_1(int decode_mode, alt_8 buf, char ascii) {
 					AdjustChar("HUMAN", 34, 28);
 				} else {
 					playertype = COMPUTER;
-					AdjustChar("COMP", 34, 28);
+					AdjustChar("COMP ", 34, 28);
 				}
 			}
 			break;
@@ -327,6 +344,7 @@ void state_1(int decode_mode, alt_8 buf, char ascii) {
 			}
 			break;
 		case DOWN_ARROW:
+			printf("DOWN");
 			if (cursor < 2) {
 				cursor += 1;
 			}

@@ -37,6 +37,7 @@ aud_buf ab_1;
 aud_buf *ab = &ab_1;
 short int file_handle;
 char* fname = "clip.wav";
+int aOn = 0;
 
 int windPower = 0;
 struct player p[3];
@@ -61,20 +62,21 @@ int fUp = 0;
 int fFire = 0;
 int fpUp = 0;
 int fpDown = 0;
+int fBullet;
 
 void GameOverScreen() {
 	clearScreen();
-	//updateScreen();
+	updateScreen();
 	clearCharBuffer();
 
 	initSD();
 	int i;
 	for (i = 0; i < numPlayers; ++i) {
-		if (p[i].name != NULL) {
+		if (p[i].name != NULL && p[i].type == HUMAN) {
 			char name[10];
 			strcpy(name, p[i].name);
-			writeSD(name, 1);
-			printf("write %i\n", i);
+			writeSD(name, p[i].points);
+			printf("write:%i score: %i\n", i,p[i].points);
 		}
 	}
 
@@ -82,7 +84,12 @@ void GameOverScreen() {
 		printf("%s", p[i].name);
 	}
 
+	printString("GAME OVER!", 30, 25);
+	usleep(10000000);
+
 	clearScreen();
+	updateScreen();
+	clearCharBuffer();
 	//displayHighScore("abc","a","b","c");
 	if (numPlayers == 2) {
 		displayHighScore(p[pOne].name, p[pTwo].name, NULL, NULL);
@@ -96,22 +103,6 @@ void GameOverScreen() {
 		printf("ALL");
 	}
 	updateScreen();
-	clearScreen();
-
-	if (numPlayers == 2) {
-		displayHighScore(p[pOne].name, p[pTwo].name, NULL, NULL);
-		printf("TWO");
-	} else if (numPlayers == 3) {
-		displayHighScore(p[pOne].name, p[pTwo].name, p[pThree].name, NULL);
-		printf("THREE");
-	} else {
-		displayHighScore(p[pOne].name, p[pTwo].name, p[pThree].name,
-				p[pFour].name);
-		printf("ALL");
-	}
-	updateScreen();
-
-	//printString("GAME OVER!", 30, 25);
 	usleep(10000000);
 	state = 0;
 }
@@ -137,6 +128,9 @@ static void keyboard_ISR(void *c, alt_u32 id) { //keyboard interrupt handler
 				break;
 			case 'S': //down arrow
 				fDown = 1;
+				break;
+			case 'Q': //down arrow
+				fBullet = 1;
 				break;
 			case 0: //page up
 				break;
@@ -180,6 +174,10 @@ static void keyboard_ISR(void *c, alt_u32 id) { //keyboard interrupt handler
 				break;
 			case 27: //down arrow
 				fDown = 0;
+				break;
+			case 21: //bullet switchs
+				//changes power, no function yet
+				fBullet = 0;
 				break;
 			case 0: //page up
 				//changes power, no function yet
@@ -278,9 +276,7 @@ int main(void) {
 		clean_up();
 		initKeyboard();
 		initState0();
-		file_handle = initAudio(fname);
-		alt_irq_register(AUDIO_0_IRQ, &ab, (alt_isr_func) write_fifo);
-		alt_up_audio_enable_write_interrupt(ab->audio);
+
 
 		//This is for Isaac cause he doesnt have a keyboard
 		if (IORD(keys,0) == 8) {
@@ -291,15 +287,15 @@ int main(void) {
 			while (state == 0) {
 				decode_scancode(ps2, &decode_mode, buf, &ascii);
 				state_0(decode_mode, buf[0]);
-				loop_audio(file_handle, fname, ab);
-
 			};
-
 			initState1(pOne);
+			if(aOn)file_handle = initAudio(fname);
+			if(aOn)alt_irq_register(AUDIO_0_IRQ, &ab, (alt_isr_func) write_fifo);
+			if(aOn)		alt_up_audio_enable_write_interrupt(ab->audio);
 			while (state == 1) {
 				decode_scancode(ps2, &decode_mode, buf, &ascii);
 				state_1(decode_mode, buf[0], ascii);
-				loop_audio(file_handle, fname, ab);
+				if(aOn)loop_audio(file_handle, fname, ab);
 			};
 		}
 
@@ -320,24 +316,25 @@ int main(void) {
 		drawName(p[pOne].name, p[pTwo].name, p[pThree].name, p[pFour].name);
 		drawGas(p[pOne].gas);
 		drawHealth(p[pOne].hp, p[pTwo].hp, p[pThree].hp, p[pFour].hp);
-		drawBullet(0);
-		drawWindIndicator(1);
+		drawBullet(p[pOne].bulletType);
+		//drawWindIndicator(1);
 		updateScreen();
 
 		updateField();
 		drawName(p[pOne].name, p[pTwo].name, p[pThree].name, p[pFour].name);
 		drawGas(p[pOne].gas);
 		drawHealth(p[pOne].hp, p[pTwo].hp, p[pThree].hp, p[pFour].hp);
-		drawBullet(0);
-		drawWindIndicator(1);
+		drawBullet(p[pOne].bulletType);
+		//drawWindIndicator(1);
 
 		initAI();
 
 		float time;
 		alt_timestamp_start();
 
-		start_time = (float) alt_timestamp() / (float) alt_timestamp_freq();
-		printf("NUM PLAYERA %i\n", numPlayers);
+
+		int start_timer_flag = 1;
+		//printf("NUM PLAYERA %i\n", numPlayers);
 		int i;
 		while (state == 2) {
 			int fallFlag = 1;
@@ -345,22 +342,30 @@ int main(void) {
 			while (fallFlag == 1) {
 				fallFlag = 0;
 				for (i = 0; i < numPlayers; i++) {
-					if (p[i].isFalling && p[i].alive) {
-						if(fallFlag==0){
-							undrawPlayers();
+					if (p[i].alive) {
+						if (p[i].y + TANK_HEIGHT > SCREEN_HEIGHT) {
+							p[i].hp = 0;
+							p[i].alive = DEAD;
 						}
-						fallFlag = 1;
 						checkPlayerFalling(i);
+						if (p[i].isFalling) {
+							undrawPlayer(i);
+							updatePlayer(i);
+							fallFlag = 1;
+							//checkPlayerFalling(i);
+						}
 					}
-					updatePlayer(i);
 				}
-				if(fallFlag == 1){
-				updateScreen();
+				if (fallFlag == 1) {
+					updateScreen();
 				}
 			}
 
-			time = (float) alt_timestamp() / (float) alt_timestamp_freq()
-					- start_time;
+			if(start_timer_flag){
+				start_time = (float) alt_timestamp() / (float) alt_timestamp_freq();
+				start_timer_flag = 0;
+			}
+			time = (float) alt_timestamp() / (float) alt_timestamp_freq()-start_time;
 			if (time >= setTime) {
 				setPlayerTurn();
 			}
@@ -384,9 +389,8 @@ int main(void) {
 			}
 		}
 
-
 		alt_up_ps2_disable_read_interrupt(ps2);
-		alt_up_audio_disable_write_interrupt(ab->audio);
+		if(aOn)alt_up_audio_disable_write_interrupt(ab->audio);
 
 		GameOverScreen();
 	}
@@ -403,9 +407,10 @@ void runGame(void) {
 	//updateField();
 
 	for (i = 0; i < numPlayers; i++) {
-		updatePlayer(i);
+		if(p[i].alive)updatePlayer(i);
 	}
 
+	drawBullet(p[turn].bulletType);
 	drawGas(p[turn].gas);
 	drawPower(p[turn].power);
 	updateScreen();
@@ -479,10 +484,14 @@ void updateActions() {
 		if (p[turn].power + 1 <= 100)
 			p[turn].power++;
 	}
+	if (fBullet == 1) {
+		fBullet = 0;
+		p[turn].bulletType = (p[turn].bulletType + 1)%2;
+	}
 	if (fFire == 1) {
 		if (!p[turn].isFalling) {
 			alt_up_ps2_disable_read_interrupt(ps2);
-			turretFire(turn, p[turn].power, windPower, 0);
+			turretFire(turn, p[turn].power, windPower, p[turn].bulletType);
 			setPlayerTurn();
 			alt_up_ps2_enable_read_interrupt(ps2);
 			printf("Before enabled interupt\n");
@@ -490,8 +499,8 @@ void updateActions() {
 			printf("Fifo cleared\n");
 			fFire = 0;
 			drawHealth(p[pOne].hp, p[pTwo].hp, p[pThree].hp, p[pFour].hp);
-			drawBullet(0);
-			drawWindIndicator(1);
+			drawBullet(p[turn].bulletType);
+			//drawWindIndicator(1);
 			updateScreen();
 			drawHealth(p[pOne].hp, p[pTwo].hp, p[pThree].hp, p[pFour].hp);
 		}

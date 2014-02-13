@@ -33,6 +33,7 @@ extern aud_buf ab_1;
 extern aud_buf *ab;
 extern short int file_handle;
 extern char* fname;
+extern int aOn;
 
 void av_config_setup();
 void open_sd(void);

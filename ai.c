@@ -12,6 +12,8 @@
 void aiMain(int turn) {
 	if (p[turn].ai.isHit) {
 		p[turn].ai.turnLock = 1;
+		p[turn].ai.offset = 0;
+		p[turn].ai.offshoot = 1;
 		aiMove(p[turn].ai.hitBy);
 		p[turn].ai.isHit = FALSE;
 	}
@@ -19,19 +21,26 @@ void aiMain(int turn) {
 		p[turn].ai.target = findClosest();
 		p[turn].ai.hasTarget = TRUE;
 		p[turn].ai.turnLock = 1;
+		p[turn].ai.offset = 0;
+		p[turn].ai.offshoot = 1;
 	} else if (p[turn].ai.target != findClosest()) {
 		p[turn].ai.target = findClosest();
 		p[turn].ai.hasTarget = TRUE;
 		p[turn].ai.turnLock = 1;
+		p[turn].ai.offset = 0;
+		p[turn].ai.offshoot = 1;
 	}
 //	if (p[p[turn].ai.target].moved) {
 //		p[turn].ai.turnLock = 1;
+//		p[turn].ai.offset = 0;
+//		p[turn].ai.offshoot = 1;
 //	}
 
 	//printf("target: %i\n", p[turn].ai.target);
 	p[turn].ai.checkNum = 0;
+	p[turn].ai.fire = 0;
 
-	aiFire(p[turn].ai.target, turn, 80, 0);
+	aiFire(p[turn].ai.target, turn, 80);
 
 	p[turn].ai.turnLock++;
 }
@@ -59,8 +68,8 @@ int pythag(int id) {
 
 int bPythag(int id, int screenX, int screenY) {
 	int a, b, c;
-	a = p[id].x - screenX;
-	b = p[id].y - screenY;
+	a = (p[id].x + TANK_LENGTH/2) - screenX;
+	b = (p[id].y + TANK_LENGTH/2) - screenY;
 	c = sqrt((a * a) + (b * b));
 	return c;
 }
@@ -88,7 +97,7 @@ int targetDir(int target) {
 		return LEFT;
 }
 
-int aiFire(int target, int turn, int power, int fire) {
+int aiFire(int target, int turn, int power) {
 	struct bullet b;
 	int i;
 	int bullet_alive = 1;
@@ -96,14 +105,16 @@ int aiFire(int target, int turn, int power, int fire) {
 
 	int tDir = targetDir(target);
 	p[turn].dir = tDir;
-	if (p[turn].ai.checkNum > 3) {
+	if (p[turn].ai.checkNum > 9) {
 		p[turn].ai.checkNum = 0;
-		return aiFire(target, turn, power, 1);
+		p[turn].ai.fire = 1;
+		return aiFire(target, turn, power);
 	}
-	if (fire == TRUE) {
-		p[turn].deg = (40 / p[turn].ai.turnLock) * p[turn].ai.closest[0];
+
+	if (p[turn].ai.fire == TRUE) {
+		p[turn].deg = p[turn].ai.offshoot *((12 / p[turn].ai.turnLock) * p[turn].ai.closest[0]) + p[turn].ai.offset + 10;
 	} else
-		p[turn].deg = (40 / p[turn].ai.turnLock) * p[turn].ai.checkNum;
+		p[turn].deg = p[turn].ai.offshoot *((12 / p[turn].ai.turnLock) * p[turn].ai.checkNum) + p[turn].ai.offset + 10;
 
 	int turret_start_x = p[turn].x + TANK_LENGTH / 2 + getTurretWidth(
 			p[turn].deg * tDir);
@@ -128,7 +139,7 @@ int aiFire(int target, int turn, int power, int fire) {
 		//updateField();
 
 
-		if (fire) {
+		if (p[turn].ai.fire) {
 			undrawPlayers();
 			for (i = 0; i < numPlayers; ++i) {
 				updatePlayer(i);
@@ -146,18 +157,29 @@ int aiFire(int target, int turn, int power, int fire) {
 		//printf("dx:%i dy:%i \n",b.dx,b.dy);
 		if (getHitPlayer(screenX, screenY, 2)) {
 			bullet_alive = 0;
-			if (fire) {
+			if (p[turn].ai.fire) {
 				bulletExplode(screenX, screenY, 1);
+				p[turn].ai.offset = abs(p[turn].deg);
+				printf("offset: %i\npower: %i\nturnLock: %i\noffshoot: %i\n", p[turn].ai.offset, power, p[turn].ai.turnLock, p[turn].ai.offshoot);
 				return 1;
 			}
-			printf("stuff");
-			return aiFire(target, turn, power, 1);
+			p[turn].ai.fire = 1;
+			return aiFire(target, turn, power);
 		} else if (getHitGround(screenX, screenY, 2)) {
 			bullet_alive = 0;
-			if (fire) {
+			if (p[turn].ai.fire) {
 				bulletExplode(screenX, screenY, 1);
 				field[screenX] = field[screenX] + 1;
 				printf("hit ground!\n");
+				p[turn].ai.offset = abs(p[turn].deg);
+				printf("offset: %i\npower: %i\nturnLock: %i\noffshoot: %i\n", p[turn].ai.offset, power, p[turn].ai.turnLock, p[turn].ai.offshoot);
+				if(tDir == RIGHT){
+					p[turn].ai.offshoot = p[target].x > screenX ? RIGHT : LEFT;
+				}
+				else if (tDir == LEFT){
+					p[turn].ai.offshoot = p[target].x < screenX ? RIGHT : LEFT;
+				}
+
 				return 1;
 			}
 			if (p[turn].ai.checkNum == 0) {
@@ -171,13 +193,13 @@ int aiFire(int target, int turn, int power, int fire) {
 				p[turn].ai.closest[1] = bPythag(p[turn].ai.target, screenX, screenY);
 			}
 			p[turn].ai.checkNum++;
-			return aiFire(target, turn, power, 0);
+			return aiFire(target, turn, power);
 		} else if (screenX >= SCREEN_WIDTH - 1 || screenX <= 0 || screenY
 				>= SCREEN_HEIGHT - 1) {
 			undrawBullet((b.x - b.dx) / PIXEL_SCALE,(b.y - b.dy) / PIXEL_SCALE);
 			bullet_alive = 0;
 			p[turn].ai.checkNum++;
-			return aiFire(target, turn, power, 0);
+			return aiFire(target, turn, power);
 		}
 	} while (bullet_alive);
 	return 0;
@@ -185,11 +207,19 @@ int aiFire(int target, int turn, int power, int fire) {
 
 void aiMove(int hitBy) {
 	int steps;
+	int i;
 	int dir = targetDir(hitBy);
 	for (steps = 0; steps < 30; steps++) {
+		undrawPlayers();
 		if (dir == RIGHT) {
 			moveLeft(turn);
 		} else
 			moveRight(turn);
+		for(i=0;i<numPlayers; i++){
+			if(p[i].alive){
+				updatePlayer(i);
+			}
+		}
+		updateScreen();
 	}
 }

@@ -8,6 +8,7 @@
 #ifndef MENU_H_
 #define MENU_H_
 
+#include "audio.h"
 #include "screen.h"
 #include "altera_up_ps2_keyboard.h"
 #include "altera_up_avalon_ps2.h"

@@ -42,7 +42,7 @@ void clearScreen() {
 void updateScreen() {
 	alt_up_pixel_buffer_dma_swap_buffers(pixel_buffer);
 	while (alt_up_pixel_buffer_dma_check_swap_buffers_status(pixel_buffer)){
-				loop_audio(file_handle, fname, ab);
+		if(aOn)loop_audio(file_handle, fname, ab);
 	}
 
 	//printf("is it white?"); 	for (count = 0; count < wait; ++count) {	}
@@ -56,7 +56,7 @@ void updateField() {
 	int i, j;
 	unsigned int addr;
 	for (i = 0; i < SCREEN_WIDTH; i++) {
-		loop_audio(file_handle, fname, ab);
+		if(aOn)loop_audio(file_handle, fname, ab);
 		for (j = field[i]; j < SCREEN_HEIGHT; j++) {
 			addr = ((i & pixel_buffer->x_coord_mask) << 1);
 			addr += (((j & pixel_buffer -> y_coord_mask) * 320) << 1);
@@ -77,7 +77,7 @@ void updatePlayer(int id) {
 	switch (p[id].character) {
 	case MARIO:
 		for (i = 0; i < TANK_LENGTH; i++) {
-			loop_audio(file_handle, fname, ab);
+			if(aOn)loop_audio(file_handle, fname, ab);
 			for (j = 0; j < TANK_HEIGHT; j++) {
 				if (p[id].dir == RIGHT && mario_right[j][i] != MASK)
 					fastPixel(x + i, y + j, mario_right[j][i]);
@@ -88,7 +88,7 @@ void updatePlayer(int id) {
 		break;
 	case LUIGI:
 		for (i = 0; i < TANK_LENGTH; i++) {
-			loop_audio(file_handle, fname, ab);
+			if(aOn)loop_audio(file_handle, fname, ab);
 			for (j = 0; j < TANK_HEIGHT; j++) {
 				if (p[id].dir == RIGHT && luigi_right[j][i] != MASK)
 					fastPixel(x + i, y + j, luigi_right[j][i]);
@@ -125,10 +125,10 @@ void updatePlayer(int id) {
 void undrawBullet(int x, int y) {
 	int i, j;
 	unsigned int addr;
-	int offset = 5;
+	int offset = 10;
 
 	for (i = x - offset; i < x + offset; i++) {
-		loop_audio(file_handle, fname, ab);
+		if(aOn)loop_audio(file_handle, fname, ab);
 		for (j = y - offset; j < y + offset; j++) {
 			addr = ((i & pixel_buffer->x_coord_mask) << 1);
 			addr += (((j & pixel_buffer -> y_coord_mask) * 320) << 1);
@@ -332,7 +332,7 @@ void undrawPlayers() {
 	int offset = 16;
 	//TODO:change to cycle only alive players
 	for (id = 0; id < numPlayers; ++id) {
-		loop_audio(file_handle, fname, ab);
+		if(aOn)loop_audio(file_handle, fname, ab);
 		x = p[id].x;
 		y = p[id].y;
 
@@ -344,6 +344,22 @@ void undrawPlayers() {
 		}
 
 	}
+}
+
+void undrawPlayer(int id) {
+	int i, j, x, y, character;
+	int offset = 16;
+	//TODO:change to cycle only alive players
+		if(aOn)loop_audio(file_handle, fname, ab);
+		x = p[id].x;
+		y = p[id].y;
+
+		character = p[id].character;
+		for (j = -offset; j < TANK_HEIGHT + offset; j++) {
+			for (i = -offset; i < TANK_LENGTH + offset; i++) {
+				fastPixel(x + i, y + j, map[y + j][x + i]);
+			}
+		}
 }
 
 void fastPixel(int x, int y, int colour) {
@@ -376,12 +392,12 @@ void drawHealth(int health1, int health2, int health3, int health4) {
 	int health;
 
 	// Test Image
-	for (j = 0; j < CHARACTER_MARIO_HEIGHT; j++) {
+/*	for (j = 0; j < CHARACTER_MARIO_HEIGHT; j++) {
 		loop_audio(file_handle, fname, ab);
 		for (i = 0; i < CHARACTER_MARIO_WIDTH; i++) {
 			alt_up_pixel_buffer_dma_draw(pixel_buffer, 0xffff, i, j);
 		}
-	}
+	}*/
 
 	while (count < numPlayers) {
 		if (count == 0) {
@@ -409,24 +425,24 @@ void drawHealth(int health1, int health2, int health3, int health4) {
 							+ CHARACTER_MARIO_WIDTH;
 
 					// Test Image
-					for (j = 0; j < CHARACTER_MARIO_HEIGHT; j++) {
+/*					for (j = 0; j < CHARACTER_MARIO_HEIGHT; j++) {
 						for (i = 0, x_coordinate = (CHARACTER_MARIO_WIDTH
 								+ HEALTH_BAR_WIDTH); i < CHARACTER_MARIO_WIDTH; i++, x_coordinate++) {
 							alt_up_pixel_buffer_dma_draw(pixel_buffer, 0x7e0,
 									x_coordinate, j);
 						}
-					}
+					}*/
 
 				} else if (count == 2) {
 					// Test Image
-					for (j = 0; j < CHARACTER_MARIO_HEIGHT; j++) {
+/*					for (j = 0; j < CHARACTER_MARIO_HEIGHT; j++) {
 						for (i = 0, x_coordinate = (CHARACTER_MARIO_WIDTH
 								+ HEALTH_BAR_WIDTH) * 2 + BULLET_BORDER_WIDTH; i
 								< CHARACTER_MARIO_WIDTH; i++, x_coordinate++) {
 							alt_up_pixel_buffer_dma_draw(pixel_buffer, 0xF800,
 									x_coordinate, j);
 						}
-					}
+					}*/
 
 					health = health3;
 					x_start = (CHARACTER_MARIO_WIDTH + HEALTH_BAR_WIDTH) * 2
@@ -437,14 +453,14 @@ void drawHealth(int health1, int health2, int health3, int health4) {
 							+ CHARACTER_MARIO_WIDTH + WIND_WIDTH;
 
 					// Test Image
-					for (j = 0; j < CHARACTER_MARIO_HEIGHT; j++) {
+/*					for (j = 0; j < CHARACTER_MARIO_HEIGHT; j++) {
 						for (i = 0, x_coordinate = (CHARACTER_MARIO_WIDTH
 								+ HEALTH_BAR_WIDTH) * 3 + BULLET_BORDER_WIDTH; i
 								< CHARACTER_MARIO_WIDTH; i++, x_coordinate++) {
 							alt_up_pixel_buffer_dma_draw(pixel_buffer, 0x1f,
 									x_coordinate, j);
 						}
-					}
+					}*/
 
 				}
 			}
@@ -454,7 +470,7 @@ void drawHealth(int health1, int health2, int health3, int health4) {
 
 		percentage = (HEALTH_GREEN_X_END - HEALTH_GREEN_X_START) * health / 100;
 		for (j = 0; j < HEALTH_BAR_HEIGHT; j++, y_coordinate++) {
-			loop_audio(file_handle, fname, ab);
+			if(aOn)loop_audio(file_handle, fname, ab);
 			// y_coordinate in the green region
 			if ((j >= HEALTH_GREEN_Y_START) && (j <= HEALTH_GREEN_Y_END)) {
 				// Before the grey area
@@ -493,7 +509,7 @@ void drawGas(int gas) {
 	percentage = (GAS_BLUE_Y_END - GAS_BLUE_Y_START) * gas / 100;
 
 	for (i = 0, x_coordinate = x_start; i < GAS_BAR_WIDTH; i++, x_coordinate++) {
-		loop_audio(file_handle, fname, ab);
+		if(aOn)loop_audio(file_handle, fname, ab);
 		// In the region
 		if ((i >= GAS_BLUE_X_START) && (i <= GAS_BLUE_X_END)) {
 
@@ -523,7 +539,7 @@ void drawGas(int gas) {
 
 	if (gas == 99) {
 		for (j = 0, y_coordinate = y_start + GAS_BLUE_Y_START + 2; j < 1; j++, y_coordinate++) {
-			loop_audio(file_handle, fname, ab);
+			if(aOn)loop_audio(file_handle, fname, ab);
 			for (i = 0, x_coordinate = x_start + GAS_BLUE_X_START; i
 					< GAS_BLUE_X_END - GAS_BLUE_X_START + 1; i++, x_coordinate++)
 				alt_up_pixel_buffer_dma_draw(pixel_buffer, 0x4e9a,
@@ -531,7 +547,7 @@ void drawGas(int gas) {
 		}
 	} else if (gas == 100) {
 		for (j = 0, y_coordinate = y_start + GAS_BLUE_Y_START + 1; j < 2; j++, y_coordinate++) {
-			loop_audio(file_handle, fname, ab);
+			if(aOn)loop_audio(file_handle, fname, ab);
 			for (i = 0, x_coordinate = x_start + GAS_BLUE_X_START; i
 					< GAS_BLUE_X_END - GAS_BLUE_X_START + 1; i++, x_coordinate++)
 				alt_up_pixel_buffer_dma_draw(pixel_buffer, 0x4e9a,
@@ -551,7 +567,7 @@ void drawPower(int power) {
 	percentage = (POWER_RED_Y_END - POWER_RED_Y_START) * power / 100;
 
 	for (i = 0, x_coordinate = x_start; i < POWER_BAR_WIDTH; i++, x_coordinate++) {
-		loop_audio(file_handle, fname, ab);
+		if(aOn)loop_audio(file_handle, fname, ab);
 		// In the region
 		if ((i >= POWER_RED_X_START) && (i <= POWER_RED_X_END)) {
 
@@ -578,7 +594,7 @@ void drawPower(int power) {
 
 	if (power == 99) {
 		for (j = 0, y_coordinate = y_start + POWER_RED_Y_START + 2; j < 1; j++, y_coordinate++) {
-			loop_audio(file_handle, fname, ab);
+			if(aOn)loop_audio(file_handle, fname, ab);
 			for (i = 0, x_coordinate = x_start + POWER_RED_X_START; i
 					< POWER_RED_X_END - POWER_RED_X_START; i++, x_coordinate++)
 				fastPixel(x_coordinate, y_coordinate, 0xd800);
@@ -586,7 +602,7 @@ void drawPower(int power) {
 		}
 	} else if (power == 100) {
 		for (j = 0, y_coordinate = y_start + POWER_RED_Y_START + 1; j < 2; j++, y_coordinate++) {
-			loop_audio(file_handle, fname, ab);
+			if(aOn)loop_audio(file_handle, fname, ab);
 			for (i = 0, x_coordinate = x_start + POWER_RED_X_START; i
 					< POWER_RED_X_END - POWER_RED_X_START; i++, x_coordinate++)
 				fastPixel(x_coordinate, y_coordinate, 0xd800);
@@ -604,36 +620,30 @@ void drawBullet(int bulletType) {
 
 	x_start = (CHARACTER_MARIO_WIDTH + HEALTH_BAR_WIDTH) * 2;
 	for (j = 0; j < BULLET_BORDER_HEIGHT; j++, y_coordinate++) {
-		loop_audio(file_handle, fname, ab);
+		if(aOn)loop_audio(file_handle, fname, ab);
 		for (i = 0, x_coordinate = x_start; i < BULLET_BORDER_WIDTH; i++, x_coordinate++) {
 			alt_up_pixel_buffer_dma_draw(pixel_buffer, bullet_border[j][i],
 					x_coordinate, j);
 		}
 	}
 
-	/*
+
 	 // Bullet
-	 if (bulletType == 1){
-	 bullet_height = BULLET1_HEIGHT;
-	 bullet_width = BULLET1_WIDTH;
-	 bullet = bullet1;
+	 if (bulletType == 0){
+		 alt_up_pixel_buffer_dma_draw(pixel_buffer,0xFFFF,148 + 10,5);
 	 }
 
-	 // x_start = right after the border
-	 x_start = HEALTH_BAR_WIDTH + GAS_BAR_WIDTH + 5;
-	 // y_coordinate starts at 5, right after the border
-	 y_coordinate = 5;
-	 for (j = 0 ; j < bullet_height ; j++,y_coordinate++){
-	 for(i = 0,x_coordinate = x_start; i < bullet_width ; i++,x_coordinate++){
-	 alt_up_pixel_buffer_dma_draw(pixel_buffer,bullet[j][i],x_coordinate,y_coordinate);
+	 if (bulletType == 1){
+		 alt_up_pixel_buffer_dma_draw(pixel_buffer,0xFFFF,148+ 8,5);
+		 alt_up_pixel_buffer_dma_draw(pixel_buffer,0xFFFF,148 + 10,5);
+		 alt_up_pixel_buffer_dma_draw(pixel_buffer,0xFFFF,148 + 12,5);
 	 }
-	 }
-	 */
+
 }
 
 // Wind 20px x 10px
 // Wind Direction 20px x 10px
-void drawWindIndicator(int windLevel) {
+/*void drawWindIndicator(int windLevel) {
 	int i, j, x_coordinate, y_coordinate, x_start;
 	x_start = (CHARACTER_MARIO_WIDTH + HEALTH_BAR_WIDTH) * 2;
 
@@ -641,7 +651,7 @@ void drawWindIndicator(int windLevel) {
 	if (windLevel == 1) {
 		for (j = 0, y_coordinate = BULLET_BORDER_HEIGHT; j
 				< WIND_DIRECTION_HEIGHT; j++, y_coordinate++) {
-			loop_audio(file_handle, fname, ab);
+			if(aOn)loop_audio(file_handle, fname, ab);
 			for (i = 0, x_coordinate = x_start; i < WIND_DIRECTION_WIDTH; i++, x_coordinate++) {
 				alt_up_pixel_buffer_dma_draw(pixel_buffer,
 						wind_direction[j][i], x_coordinate, y_coordinate);
@@ -652,14 +662,14 @@ void drawWindIndicator(int windLevel) {
 	else {
 		for (j = 0, y_coordinate = BULLET_BORDER_HEIGHT; j
 				< WIND_DIRECTION_HEIGHT; j++, y_coordinate++) {
-			loop_audio(file_handle, fname, ab);
+			if(aOn)loop_audio(file_handle, fname, ab);
 			for (i = WIND_DIRECTION_WIDTH - 1, x_coordinate = x_start; i >= 0; i--, x_coordinate++) {
 				alt_up_pixel_buffer_dma_draw(pixel_buffer,
 						wind_direction[j][i], x_coordinate, y_coordinate);
 			}
 		}
 	}
-}
+}*/
 
 
 void displayHighScore(char *player1,char *player2,char *player3,char *player4){

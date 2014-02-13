@@ -12,6 +12,7 @@
 #include <math.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "values.h"
 #include "player.h"
@@ -28,7 +29,7 @@ int pythag(int);
 int findPeak(int);
 void testFire(int);
 int targetDir(int);
-int aiFire(int, int, int, int);
+int aiFire(int, int, int);
 void aiMove(int);
 int bPythag(int, int, int);
 
