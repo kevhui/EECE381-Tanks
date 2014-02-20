@@ -58,32 +58,34 @@ void initPlayer(int id, int character, char *name, int hp, int gas, int type) {
 
 //moves the specified player one unit left if possible
 void moveLeft(int id) {
-	p[id].dir = LEFT;
-	int new_x = p[id].x - 1;
-	int end_y = p[id].y + TANK_HEIGHT - 1;
-	int j;
-	int counter = 0;
-	for (j = p[id].y; j < p[id].y + TANK_HEIGHT - 3; j++) {
-		if (map[j][new_x] == NOTHING) {
-			counter++;
+	if (p[id].gas != 0) {
+		p[id].dir = LEFT;
+		int new_x = p[id].x - 1;
+		int end_y = p[id].y + TANK_HEIGHT - 1;
+		int j;
+		int counter = 0;
+		for (j = p[id].y; j < p[id].y + TANK_HEIGHT - 3; j++) {
+			if (map[j][new_x] == NOTHING) {
+				counter++;
+			}
 		}
-	}
-	//printf("counter %i",counter);
-	if (counter == TANK_HEIGHT - 3) {
-		if (new_x >= 0) {
-			if ((map[end_y][new_x] == NOTHING) && (map[end_y - 1][new_x]
-					== NOTHING) && (map[end_y - 2][new_x] == NOTHING)) {
-				p[id].x -= 1;
-				p[id].gas--;
-			} else if ((map[end_y - 1][new_x] == NOTHING)
-					&& (map[end_y - 2][new_x] == NOTHING)) {
-				p[id].x -= 1;
-				p[id].y -= 1;
-				p[id].gas--;
-			} else if ((map[end_y - 2][new_x] == NOTHING)) {
-				p[id].x -= 1;
-				p[id].y -= 2;
-				p[id].gas--;
+		//printf("counter %i",counter);
+		if (counter == TANK_HEIGHT - 3) {
+			if (new_x >= 0) {
+				if ((map[end_y][new_x] == NOTHING) && (map[end_y - 1][new_x]
+						== NOTHING) && (map[end_y - 2][new_x] == NOTHING)) {
+					p[id].x -= 1;
+					p[id].gas--;
+				} else if ((map[end_y - 1][new_x] == NOTHING)
+						&& (map[end_y - 2][new_x] == NOTHING)) {
+					p[id].x -= 1;
+					p[id].y -= 1;
+					p[id].gas--;
+				} else if ((map[end_y - 2][new_x] == NOTHING)) {
+					p[id].x -= 1;
+					p[id].y -= 2;
+					p[id].gas--;
+				}
 			}
 		}
 	}
@@ -91,33 +93,35 @@ void moveLeft(int id) {
 
 //moves the specified player one unit right if possible
 void moveRight(int id) {
-	p[id].dir = RIGHT;
-	int new_x = p[id].x + TANK_LENGTH;
-	int end_y = p[id].y + TANK_HEIGHT - 1;
-	int j;
-	int counter = 0;
-	for (j = p[id].y; j < p[id].y + TANK_HEIGHT - 3; j++) {
-		if (map[j][new_x] == NOTHING) {
-			counter++;
+	if (p[id].gas != 0) {
+		p[id].dir = RIGHT;
+		int new_x = p[id].x + TANK_LENGTH;
+		int end_y = p[id].y + TANK_HEIGHT - 1;
+		int j;
+		int counter = 0;
+		for (j = p[id].y; j < p[id].y + TANK_HEIGHT - 3; j++) {
+			if (map[j][new_x] == NOTHING) {
+				counter++;
+			}
 		}
-	}
-	//printf("counter %i",counter);
-	if (counter == TANK_HEIGHT - 3) {
-		if (new_x < SCREEN_WIDTH) {
-			if ((map[end_y][new_x] == NOTHING) && (map[end_y - 1][new_x]
-					== NOTHING) && (map[end_y - 2][new_x] == NOTHING)) {
-				p[id].x += 1;
-				p[id].gas--;
-			} else if ((map[end_y - 1][new_x] == NOTHING)
-					&& (map[end_y - 2][new_x] == NOTHING)) {
-				p[id].x += 1;
-				p[id].y -= 1;
-				p[id].gas--;
-				//printf("two");
-			} else if ((map[end_y - 2][new_x] == NOTHING)) {
-				p[id].x += 1;
-				p[id].y -= 2;
-				p[id].gas--;
+		//printf("counter %i",counter);
+		if (counter == TANK_HEIGHT - 3) {
+			if (new_x < SCREEN_WIDTH) {
+				if ((map[end_y][new_x] == NOTHING) && (map[end_y - 1][new_x]
+						== NOTHING) && (map[end_y - 2][new_x] == NOTHING)) {
+					p[id].x += 1;
+					p[id].gas--;
+				} else if ((map[end_y - 1][new_x] == NOTHING)
+						&& (map[end_y - 2][new_x] == NOTHING)) {
+					p[id].x += 1;
+					p[id].y -= 1;
+					p[id].gas--;
+					//printf("two");
+				} else if ((map[end_y - 2][new_x] == NOTHING)) {
+					p[id].x += 1;
+					p[id].y -= 2;
+					p[id].gas--;
+				}
 			}
 		}
 	}
@@ -185,8 +189,8 @@ void turretFire(int turn, int power, int wind, int bulletType) {
 		fireBulletOne(turn, power, wind, bulletType);
 	}
 	/*else if (bulletType == 2) {
-		//fireBulletTwo(turn, power, wind, bulletType);
-	}*/
+	 //fireBulletTwo(turn, power, wind, bulletType);
+	 }*/
 
 }
 
@@ -262,10 +266,10 @@ void fireBulletOne(int turn, int power, int wind, int bulletType) {
 		int screenX[4], screenY[4];
 		for (i = 0; i < 4; i++) {
 			if (b.dx > 0) {
-					sb[i].x = b.x + (i + 1) * 10 * PIXEL_SCALE;
+				sb[i].x = b.x + (i + 1) * 10 * PIXEL_SCALE;
 			}
 			if (b.dx < 0) {
-					sb[i].x = b.x - (i + 1) * 10 * PIXEL_SCALE;
+				sb[i].x = b.x - (i + 1) * 10 * PIXEL_SCALE;
 			}
 
 			sb[i].y = b.y;
@@ -486,10 +490,6 @@ int getHitPlayer(int x, int y, int hitBoxLength) {
 					//printf("hit itself");
 					return 0;
 				}
-				if ((p[i].type == COMPUTER) && (p[turn].ai.fire == 1)) {
-					p[i].ai.isHit = TRUE;
-					p[i].ai.hitBy = turn;
-				}
 				return 1;
 			}
 		}
@@ -546,6 +546,10 @@ void bulletExplode(int x, int y, int bulletType) {
 							if (j > p[id].y && j < p[id].y + TANK_HEIGHT) {
 								hit = 1;
 								printf("Explosion HIT");
+								if ((p[id].type == COMPUTER) && (p[turn].ai.fire == 1)) {
+									p[id].ai.isHit = TRUE;
+									p[id].ai.hitBy = turn;
+								}
 								break;
 							}
 						}
@@ -553,8 +557,8 @@ void bulletExplode(int x, int y, int bulletType) {
 				}
 
 				if (hit == 1) {
-					p[turn].points += 20;
-					p[id].hp -= 20;
+					p[turn].points += 25;
+					p[id].hp -= 25;
 					if (p[id].hp <= 0) {
 						p[id].hp = 0;
 						p[id].alive = DEAD;
@@ -612,6 +616,10 @@ void bulletExplode(int x, int y, int bulletType) {
 							if (j > p[id].y && j < p[id].y + TANK_HEIGHT) {
 								hit = 1;
 								printf("Explosion HIT");
+								if ((p[id].type == COMPUTER) && (p[turn].ai.fire == 1)) {
+									p[id].ai.isHit = TRUE;
+									p[id].ai.hitBy = turn;
+								}
 								break;
 							}
 						}

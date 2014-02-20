@@ -36,7 +36,7 @@ void updateActions();
 aud_buf ab_1;
 aud_buf *ab = &ab_1;
 short int file_handle;
-char* fname = "clip.wav";
+char* fname = "brawl.wav";
 int aOn = 0;
 
 int windPower = 0;
@@ -85,7 +85,7 @@ void GameOverScreen() {
 	}
 
 	printString("GAME OVER!", 30, 25);
-	usleep(10000000);
+	usleep(1000000);
 
 	clearScreen();
 	updateScreen();
@@ -262,6 +262,15 @@ void initAI() {
 	int i;
 	for (i = 0; i < numPlayers; i++) {
 		p[i].ai.isHit = FALSE;
+		p[i].ai.checkNum = 0;
+		p[i].ai.closest[0] = 0;
+		p[i].ai.closest[1] = 0;
+		p[i].ai.fire = 0;
+		p[i].ai.hasTarget = 0;
+		p[i].ai.isHit = FALSE;
+		p[i].ai.offset = 0;
+		p[i].ai.offshoot = 1;
+		p[i].ai.turnLock = 1;
 	}
 }
 
@@ -276,6 +285,7 @@ int main(void) {
 		clean_up();
 		initKeyboard();
 		initState0();
+		initAI();
 
 
 		//This is for Isaac cause he doesnt have a keyboard
@@ -327,8 +337,6 @@ int main(void) {
 		drawBullet(p[pOne].bulletType);
 		//drawWindIndicator(1);
 
-		initAI();
-
 		float time;
 		alt_timestamp_start();
 
@@ -343,7 +351,7 @@ int main(void) {
 				fallFlag = 0;
 				for (i = 0; i < numPlayers; i++) {
 					if (p[i].alive) {
-						if (p[i].y + TANK_HEIGHT > SCREEN_HEIGHT) {
+						if (p[i].y + TANK_HEIGHT >= SCREEN_HEIGHT-1) {
 							p[i].hp = 0;
 							p[i].alive = DEAD;
 						}

@@ -14,7 +14,7 @@ void initField() {
 	generateField();
 }
 
-/*//TODO: Make a field generator
+//TODO: Make a field generator
 //Generates a field
 void generateField() {
 	int i, j, flag;
@@ -42,10 +42,10 @@ void generateField() {
 		}
 	}
 
-}*/
+}
 
 
-void generateField() {
+/*void generateField() {
 	int i, j, flag;
 
 	for (i = 0; i < SCREEN_WIDTH; i++) {
@@ -68,7 +68,7 @@ void generateField() {
 		}
 	}
 
-}
+}*/
 
 
 //Prints the field out

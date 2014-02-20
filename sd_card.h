@@ -14,7 +14,7 @@
 #define SCORE_BUFFER_SIZE 512
 #define MAX_CHARACTER_OF_NAME 50
 #define MAX_CHARACTER_OF_SCORE 3
-#define SCORE_NAME "score.xml"
+#define SCORE_NAME "score.txt"
 
 typedef struct score{
 	char* name;

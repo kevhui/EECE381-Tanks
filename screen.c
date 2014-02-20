@@ -685,7 +685,7 @@ void displayHighScore(char *player1,char *player2,char *player3,char *player4){
 
 
 	if (getAllScore(list) == -1){
-		alt_up_char_buffer_string(char_buffer,"No SD card inserted!",30,20);
+		alt_up_char_buffer_string(char_buffer,"No score recorded for AI!",30,20);
 	}
 	else{
 
