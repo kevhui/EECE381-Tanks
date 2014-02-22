@@ -164,7 +164,7 @@ void printLines() {
 	alt_up_pixel_buffer_dma_dev* pixel_buffer;
 	// Use the name of your pixel buffer DMA core
 	pixel_buffer = alt_up_pixel_buffer_dma_open_dev(PIXEL_BUFFER_DMA_NAME);
-	// Set the background buffer address – Although we don’t use the
+	// Set the background buffer address ï¿½ Although we donï¿½t use the
 	//background, they only provide a function to change the background
 	//buffer address, so
 	// we must set that, and then swap it to the foreground.
@@ -311,17 +311,6 @@ void printHp(int id) {
 	}
 }
 
-/*
- void drawTest() {
- int i, j;
- for (j = 0; j < HYRULE_HEIGHT; j++) {
- for (i = 0; i < HYRULE_WIDTH; i++) {
- alt_up_pixel_buffer_dma_draw(pixel_buffer, hyrule[j][i], i, j);
- }
- }
-
- }
- */
 
 void clearCharBuffer() {
 	alt_up_char_buffer_clear(char_buffer);
@@ -391,13 +380,6 @@ void drawHealth(int health1, int health2, int health3, int health4) {
 	int percentage;
 	int health;
 
-	// Test Image
-/*	for (j = 0; j < CHARACTER_MARIO_HEIGHT; j++) {
-		loop_audio(file_handle, fname, ab);
-		for (i = 0; i < CHARACTER_MARIO_WIDTH; i++) {
-			alt_up_pixel_buffer_dma_draw(pixel_buffer, 0xffff, i, j);
-		}
-	}*/
 
 	while (count < numPlayers) {
 		if (count == 0) {
@@ -424,25 +406,8 @@ void drawHealth(int health1, int health2, int health3, int health4) {
 					x_start = CHARACTER_MARIO_WIDTH + HEALTH_BAR_WIDTH
 							+ CHARACTER_MARIO_WIDTH;
 
-					// Test Image
-/*					for (j = 0; j < CHARACTER_MARIO_HEIGHT; j++) {
-						for (i = 0, x_coordinate = (CHARACTER_MARIO_WIDTH
-								+ HEALTH_BAR_WIDTH); i < CHARACTER_MARIO_WIDTH; i++, x_coordinate++) {
-							alt_up_pixel_buffer_dma_draw(pixel_buffer, 0x7e0,
-									x_coordinate, j);
-						}
-					}*/
 
 				} else if (count == 2) {
-					// Test Image
-/*					for (j = 0; j < CHARACTER_MARIO_HEIGHT; j++) {
-						for (i = 0, x_coordinate = (CHARACTER_MARIO_WIDTH
-								+ HEALTH_BAR_WIDTH) * 2 + BULLET_BORDER_WIDTH; i
-								< CHARACTER_MARIO_WIDTH; i++, x_coordinate++) {
-							alt_up_pixel_buffer_dma_draw(pixel_buffer, 0xF800,
-									x_coordinate, j);
-						}
-					}*/
 
 					health = health3;
 					x_start = (CHARACTER_MARIO_WIDTH + HEALTH_BAR_WIDTH) * 2
@@ -451,16 +416,6 @@ void drawHealth(int health1, int health2, int health3, int health4) {
 					health = health4;
 					x_start = (CHARACTER_MARIO_WIDTH + HEALTH_BAR_WIDTH) * 3
 							+ CHARACTER_MARIO_WIDTH + WIND_WIDTH;
-
-					// Test Image
-/*					for (j = 0; j < CHARACTER_MARIO_HEIGHT; j++) {
-						for (i = 0, x_coordinate = (CHARACTER_MARIO_WIDTH
-								+ HEALTH_BAR_WIDTH) * 3 + BULLET_BORDER_WIDTH; i
-								< CHARACTER_MARIO_WIDTH; i++, x_coordinate++) {
-							alt_up_pixel_buffer_dma_draw(pixel_buffer, 0x1f,
-									x_coordinate, j);
-						}
-					}*/
 
 				}
 			}
@@ -643,7 +598,7 @@ void drawBullet(int bulletType) {
 
 // Wind 20px x 10px
 // Wind Direction 20px x 10px
-/*void drawWindIndicator(int windLevel) {
+void drawWindIndicator(int windLevel) {
 	int i, j, x_coordinate, y_coordinate, x_start;
 	x_start = (CHARACTER_MARIO_WIDTH + HEALTH_BAR_WIDTH) * 2;
 
@@ -669,7 +624,7 @@ void drawBullet(int bulletType) {
 			}
 		}
 	}
-}*/
+}
 
 
 void displayHighScore(char *player1,char *player2,char *player3,char *player4){
@@ -704,11 +659,6 @@ void displayHighScore(char *player1,char *player2,char *player3,char *player4){
 			for (i=0,x_coordinate = SCREEN_WIDTH/2 - 32;i<LUIGI_WIDTH;i++,x_coordinate++)
 				alt_up_pixel_buffer_dma_draw(pixel_buffer,luigi[j][i],x_coordinate,y_coordinate);
 		}
-/*
-		for(i = SCREEN_WIDTH /2 - 1,j=0; j < SCREEN_HEIGHT ; j++){
-						alt_up_pixel_buffer_dma_draw(pixel_buffer,0xffff,i,j);
-		}
-*/
 
 
 		for (i = 0 ;i<5; i++){
