@@ -2,28 +2,27 @@
  * menu.c
  *
  *  Created on: 2014-02-03
- *      Author: Kevin
+ *      Author: Brittaney
  */
+ 
 
 #include "menu.h"
 
 
 char *display_string;//string to write to screen
-char player_name[10];//player name
-int count = 0;//count for player name
+char player_name[10];//stores player name (while configuring player)
+int count = 0;//count for player name(while configuring player)
 int playersconfig = 0;//number of players configured
-int playerCharacter;
-int playertype;
-int hp = 50;
-int gas = 25;
-//int wind=0;//initialize to light
-int audio_on = 0;
-int big_exp = 0;
-int cursor = 0;
+int playerCharacter;//mario or luigi
+int playertype;//comp or real
+int hp = 50;//health points
+int gas = 25;//gas level
+int audio_on = 0;//audio on/off
+int cursor = 0;//used while configuring player
 
 void initState0() {
+	//initializes state 0 menu screen
 	playersconfig = 0;
-
 	initScreen();
 	clearCharBuffer();
 	clearScreen();
@@ -34,13 +33,8 @@ void initState0() {
 	printString("50", 25, 24);
 	printString("GAS:", 10, 28);
 	printString("25", 15, 28);
-/*	printString("WIND:", 10, 32);
-	printString("LIGHT", 16, 32);*/
 	printString("AUDIO:", 10, 32);
 	printString("OFF", 17, 32);
-//	printString("BIG EXPLOSIONS:", 10, 40);
-//	printString("OFF", 26, 40);
-
 	printString("PRESS SPACE", 33, 50);
 	printString("CONTROLS:", 45, 20);
 	printString("LEFT AND RIGHT ARROW : MOVE TANK", 45, 24);
@@ -52,6 +46,7 @@ void initState0() {
 }
 
 void initState1(int playernum) {
+	//initializes state 1 menu screen
 	clearCharBuffer();
 	clearScreen();
 	playertype = COMPUTER;
@@ -65,33 +60,34 @@ void initState1(int playernum) {
 		printString("3", 42, 14);
 	else if (playernum == pFour)
 		printString("4", 42, 14);
-	//print player number
 	printString("ENTER NAME:_", 14, 20);
 	printString("CHANGE COLOR: ", 14, 24);
 	printString("MARIO", 28, 24);//default
-	//print player color
 	printString("SELECT PLAYER TYPE: ", 14, 28);
 	printString("COMP ", 34, 28);//default
-	//print player type
 	printString("PRESS SPACE TO START", 25, 50);
 	updateScreen();
 }
 
 void state_0(int decode_mode, alt_8 buf) {
+//checks for key press in state 0 menu
 	if (decode_mode == KB_BINARY_MAKE_CODE && buf == SPACEBAR) {
+	//SPACEBAR
 		cursor = 0;
-		state = 1;
+		state = 1;//change state
 		aOn = audio_on;
-	} else if (decode_mode == KB_LONG_BINARY_MAKE_CODE) {
+	} 
+	else if (decode_mode == KB_LONG_BINARY_MAKE_CODE) {
 		if (buf == LEFT_ARROW) {
-			if (cursor == 0) {//on # of players
+		//LEFT ARROW
+			//check which attribute the cursor is located at
+			if (cursor == 0) {
+				//Change # of Players
 				if (numPlayers > 2)
 					numPlayers -= 1;
 				updateNumPlayers();
-				//				snprintf(display_string, sizeof(display_string), "%d",
-				//						numPlayers);
-				//				AdjustChar(display_string, 29, 20);
-			} else if (cursor == 1) {//on health points
+			} else if (cursor == 1) {
+				//Change # of health points
 				if (hp > 50)
 					hp -= 10;
 				snprintf(display_string, sizeof(display_string), "%d", hp);
@@ -99,6 +95,7 @@ void state_0(int decode_mode, alt_8 buf) {
 				if (hp < 100)
 					AdjustChar(" ", 27, 24);
 			} else if (cursor == 2) {
+				//Change Gas level
 				if (gas > 0)
 					gas -= 5;
 				snprintf(display_string, sizeof(display_string), "%d", gas);
@@ -106,17 +103,8 @@ void state_0(int decode_mode, alt_8 buf) {
 				if (gas < 100)
 					AdjustChar(" ", 17, 28);
 			}
-			/*else if (cursor == 3) {
-				if (windPower == 0) {
-					windPower = 1;
-					AdjustChar("STRONG", 16, 32);
-				} else if (windPower == 1) {
-					windPower = 0;
-					AdjustChar("LIGHT", 16, 32);
-					AdjustChar(" ", 21, 32);
-				}
-			}*/
 			else if (cursor == 3) {
+				//turn audio on/off
 				if (audio_on == 0) {
 					audio_on = 1;
 					AdjustChar("ON", 17, 32);
@@ -126,47 +114,29 @@ void state_0(int decode_mode, alt_8 buf) {
 					AdjustChar("OFF", 17, 32);
 				}
 			}
-			/*else if (cursor == 5) {
-				if (big_exp == 0) {
-					big_exp = 1;
-					AdjustChar("ON", 26, 40);
-					AdjustChar(" ", 28, 40);
-				} else if (big_exp == 1) {
-					big_exp = 0;
-					AdjustChar("OFF", 26, 40);
-				}
-			}*/
 		}
 		if (buf == RIGHT_ARROW) {
+		//RIGHT ARROW
 			if (cursor == 0) {
+				//Change # of Players
 				if (numPlayers < 4)
 					numPlayers += 1;
 				updateNumPlayers();
-				/*				snprintf(display_string, sizeof(display_string), "%d",
-				 numPlayers);
-				 AdjustChar(display_string, 29, 20);*/
-			} else if (cursor == 1) {//on health points
+			} else if (cursor == 1) {
+				//Change # of health points
 				if (hp < 100)
 					hp += 10;
 				snprintf(display_string, sizeof(display_string), "%d", hp);
 				AdjustChar(display_string, 25, 24);
 			} else if (cursor == 2) {
+				//change gas level
 				if (gas < 100)
 					gas += 5;
 				snprintf(display_string, sizeof(display_string), "%d", gas);
 				AdjustChar(display_string, 15, 28);
 			}
-			/*else if (cursor == 3) {
-				if (windPower == 0) {
-					windPower = 1;
-					AdjustChar("STRONG", 16, 32);
-				} else if (windPower == 1) {
-					windPower = 0;
-					AdjustChar("LIGHT", 16, 32);
-					AdjustChar(" ", 21, 32);
-				}
-			}*/
 			else if (cursor == 3) {
+				//turn audio on/off
 				if (audio_on == 0) {
 					audio_on = 1;
 					AdjustChar("ON", 17, 32);
@@ -176,18 +146,10 @@ void state_0(int decode_mode, alt_8 buf) {
 					AdjustChar("OFF", 17, 32);
 				}
 			}
-/*			else if (cursor == 5) {
-				if (big_exp == 0) {
-					big_exp = 1;
-					AdjustChar("ON", 26, 40);
-					AdjustChar(" ", 28, 40);
-				} else if (big_exp == 1) {
-					big_exp = 0;
-					AdjustChar("OFF", 26, 40);
-				}
-			}*/
 		}
 		if (buf == UP_ARROW) {
+		//UP ARROW
+		//changes location of cursor
 			if (cursor > 0) {
 				cursor -= 1;
 			}
@@ -201,16 +163,10 @@ void state_0(int decode_mode, alt_8 buf) {
 				AdjustChar("_", 14, 28);
 				AdjustChar(" ", 16, 32);
 			}
-/*			else if (cursor == 3) {
-				AdjustChar("_", 15, 32);
-				AdjustChar(" ", 23, 36);
-			}*/
-//			 else if (cursor == 4) {
-//				AdjustChar("_", 23, 36);
-//				AdjustChar(" ", 25, 40);
-//			}
 		}
 		if (buf == DOWN_ARROW) {
+		//DOWN ARROW
+		//changes location of cursor
 			if (cursor < 3) {
 				cursor += 1;
 			}
@@ -224,32 +180,23 @@ void state_0(int decode_mode, alt_8 buf) {
 				AdjustChar("_", 16, 32);
 				AdjustChar(" ", 14, 28);
 			}
-/*
-			else if (cursor == 4) {
-				AdjustChar("_", 16, 36);
-				AdjustChar(" ", 15, 32);
-			}
-*/
-//			 else if (cursor == 5) {
-//				AdjustChar("_", 25, 40);
-//				AdjustChar(" ", 23, 36);
-//			}
 		}
 	}
 }
 
 void state_1(int decode_mode, alt_8 buf, char ascii) {
-	if (decode_mode == KB_ASCII_MAKE_CODE) {//letters
+//checks for key press in state 1 menu
+	if (decode_mode == KB_ASCII_MAKE_CODE) {
+		//Enter Name
 		Name_Entered(ascii);
 	}
 
 	else if (decode_mode == KB_BINARY_MAKE_CODE) {
 		if (buf == SPACEBAR) {
-			printf("SPACE HIT");
-			//TODO: make an options menu to adust hp
-			//printf("playerCharacter %i",playerCharacter);
+		//SPACE BAR
+			//check if all players have been configured
+			//and decide whether to change state or configure ANOTHER player
 			if (playersconfig < numPlayers - 1) {
-				printf("first");
 				if (count > 0) {
 					initPlayer(playersconfig, playerCharacter, player_name, hp,
 							gas, playertype);
@@ -258,13 +205,11 @@ void state_1(int decode_mode, alt_8 buf, char ascii) {
 							gas, playertype);
 				}
 				clearPlayerName();
-				playersconfig++;//this corresponds to the player ID
+				playersconfig++;
 				cursor = 0;
 				count = 0;
 				initState1(playersconfig);
-			} else {
-				printf("about to change to game state");
-				if (count > 0) {
+			} else { if (count > 0) {
 					initPlayer(playersconfig, playerCharacter, player_name, hp,
 							gas, playertype);
 				} else {
@@ -280,7 +225,9 @@ void state_1(int decode_mode, alt_8 buf, char ascii) {
 					initPlayer(pFour, MARIO, NULL, hp, gas, HUMAN);
 				}
 			}
-		} else if (buf == BACKSPACE) {//back space
+		} else if (buf == BACKSPACE) {
+		  //BACK SPACE
+		  	//change player name 
 			if (cursor == 0) {
 				if (count > 0) {
 					player_name[count - 1] = 0;
@@ -291,7 +238,8 @@ void state_1(int decode_mode, alt_8 buf, char ascii) {
 		}
 	} else if (decode_mode == KB_LONG_BINARY_MAKE_CODE) {
 		switch (buf) {
-		case LEFT_ARROW: //left
+			//check key pressed and location of cursor
+		case LEFT_ARROW:
 			if (cursor == 1) {
 				if (playerCharacter == LUIGI) {
 					playerCharacter = MARIO;
@@ -311,7 +259,7 @@ void state_1(int decode_mode, alt_8 buf, char ascii) {
 				}
 			}
 			break;
-		case RIGHT_ARROW: //right
+		case RIGHT_ARROW:
 			if (cursor == 1) {
 				if (playerCharacter == LUIGI) {
 					playerCharacter = MARIO;
@@ -331,7 +279,7 @@ void state_1(int decode_mode, alt_8 buf, char ascii) {
 				}
 			}
 			break;
-		case UP_ARROW: //up
+		case UP_ARROW: 
 			if (cursor > 0) {
 				cursor -= 1;
 			}
@@ -344,7 +292,6 @@ void state_1(int decode_mode, alt_8 buf, char ascii) {
 			}
 			break;
 		case DOWN_ARROW:
-			printf("DOWN");
 			if (cursor < 2) {
 				cursor += 1;
 			}
@@ -361,10 +308,13 @@ void state_1(int decode_mode, alt_8 buf, char ascii) {
 }
 
 void AdjustChar(char *string, int x, int y) {
+	//print test string on screen at location x,y
 	printString(string, x, y);
 }
 
 void clearPlayerName() {
+	//when player is finished being configured
+	//clear player name variable so that we can configure a new player
 	while (count > 0) {
 		player_name[count] = 0;
 		count--;
@@ -372,13 +322,14 @@ void clearPlayerName() {
 }
 
 void Name_Entered(char *a) {
+	//Displays and stores player name while being configured
 	player_name[count] = a;
 	count++;
-	if (count <= 10)
-		AdjustChar(player_name, 26, 20);
+	if (count <= 10) AdjustChar(player_name, 26, 20);
 }
 
 void updateNumPlayers() {
+	//Adjusts and displays desired number of players
 	switch (numPlayers) {
 	case 2:
 		AdjustChar("_2", 28, 20);
