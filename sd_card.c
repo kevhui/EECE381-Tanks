@@ -7,37 +7,7 @@
 
 #include "sd_card.h"
 
-/*void printSD() {
- alt_up_sd_card_dev *device_reference = NULL;
- int connected = 0;
- char* fileName;
- device_reference = alt_up_sd_card_open_dev(SD_CARD_NAME);
- if (device_reference != NULL) {
- while (1) {
- if ((connected == 0) && (alt_up_sd_card_is_Present())) {
- printf("Card connected. \n");
- printf("fat16: %d", alt_up_sd_card_is_FAT16());
- if (alt_up_sd_card_is_FAT16()) {
- printf("FAT16 file system detected. \n");
 
- if (alt_up_sd_card_find_first("", fileName) == 0) {
- printf("Files detected: \n");
- do {
- printf("%s \n", fileName);
- } while (alt_up_sd_card_find_next(fileName) == 0);
- }
- } else {
- printf("Unknown file system. \n");
- }
- connected = 1;
- } else if ((connected == 1) && (alt_up_sd_card_is_Present()
- == false)) {
- printf("Card disconnected. \n");
- connected = 0;
- }
- }
- }
- }*/
 void initSD() {
 	int connected = 0;
 	alt_up_sd_card_dev *device_reference = NULL;
@@ -45,10 +15,10 @@ void initSD() {
 	if (device_reference != NULL) {
 
 		if ((connected == 0) && (alt_up_sd_card_is_Present())) {
-			//printf("Card connected. \n");
-			//printf("fat16: %d",alt_up_sd_card_is_FAT16());
+			printf("Card connected. \n");
+			printf("fat16: %d",alt_up_sd_card_is_FAT16());
 			if (alt_up_sd_card_is_FAT16())
-				; //printf("FAT16 file system detected. \n");
+				printf("FAT16 file system detected. \n");
 			else
 				printf("Unknown file system. \n");
 			connected = 1;
@@ -97,12 +67,8 @@ void writeSD(char name[], int score) {
 			alt_up_sd_card_write(handler, score_str[index]);
 			index++;
 		}
-		//alt_up_sd_card_write(handler, 0x20); // double_space
-		//alt_up_sd_card_write(handler, 0x20);
-		//alt_up_sd_card_write(handler, 0x00); //  null
 		alt_up_sd_card_fclose(handler);
 	} else {
-		//printf("%c",name_score[0][0][index]);
 		printf("Handler:%d\n", handler);
 		printf("Cannot write the score. \n");
 	}
@@ -111,23 +77,9 @@ void writeSD(char name[], int score) {
 
 void setPositionToEnd(short int handler) {
 	int position = alt_up_sd_card_read(handler);
-	//int numOfChar = 0;
-	//int count = 0;
 	while (position >= 0) {
-		//numOfChar++;
-		//printf("%c",position);
 		position = alt_up_sd_card_read(handler);
-		/*printf("%d",numOfChar);
-		 printf("%c",position);*/
 	}
-	/*
-	 alt_up_sd_card_fclose(handler);
-	 handler = alt_up_sd_card_fopen(SCORE_NAME, false);
-	 position = alt_up_sd_card_read(handler);
-	 while (count < numOfChar){
-	 alt_up_sd_card_read(handler);
-	 count++;
-	 }*/
 }
 
 int getAllScore(score list[]) {
@@ -145,8 +97,6 @@ int getAllScore(score list[]) {
 				list[j].score[i] = word;
 			}
 			list[j].score[i] = '\0';
-			//word = alt_up_sd_card_read(handler);
-			//word = alt_up_sd_card_read(handler);
 			word = alt_up_sd_card_read(handler);
 			if (!(list[j].name[0]=='\0'||list[j].score[0]=='\0'))
 				j++; // move to next player
@@ -159,18 +109,6 @@ int getAllScore(score list[]) {
 			i++;
 			if ((int) word == 0x2F)
 				list[j].name[i] = '\0';
-			/*
-			 }
-
-			 //printf("j: %d",j);
-			 if (list[j].name == NULL){
-			 list[j].name[0] = word;
-			 list[j].name[1] = '\0';
-			 }
-			 else
-			 appendCharacter(list[j].name,word);
-			 //printf("name:%s\n",list[j].name);
-			 word = alt_up_sd_card_read(handler);*/
 		}
 
 	}
@@ -193,24 +131,11 @@ void getMax10Score(score list[], score max_score[]) {
 	score tmp;
 
 	for (i = 0; list[i].name[0] != '\0'; i++) {
-		//printf("player:%s score:%s\n",list[1].name,list[1].score);
 		tmp_arr[i] = list[i];
 	}
-	//printf("i:%s score:%s\n",list[1].name,list[1].score);
-	//printf("i:%s score:%s\n",tmp_arr[2].name,tmp_arr[2].score);
+
 	tmp_arr[i].name[0] = '\0';
-	//printf("i:%s score:%s\n",tmp_arr[2].name,tmp_arr[2].score);
-	//printf("i:%s score:%s\n",list[1].name,list[1].score);
-	/*for (i = 0 ; list[i].name[0] != '\0'; i++){
-	 printf("player:%s score:%s\n",list[1].name,list[1].score);
-	 }*/
-	/*
-	 for (i = 0; tmp_arr[i].name[0] != '\0' ; i++){
-	 printf("yes\n");
-	 printf("player:%s\n",tmp_arr[1].name);
-	 printf("score:%s\n",tmp_arr[1].score);
-	 }
-	 *///printf("i:%s score:%s\n",tmp_arr[1].name,tmp_arr[1].score);
+
 
 	for (j = 0; j < i - 1; j++) {
 		for (k = j + 1; k < i; k++) {
@@ -221,7 +146,6 @@ void getMax10Score(score list[], score max_score[]) {
 			}
 		}
 	}
-	//printf("i:%s score:%s\n",tmp_arr[1].name,tmp_arr[1].score);
 
 	for (i = 0; i < 10 && tmp_arr[i].name[0] != '\0'; i++)
 		max_score[i] = tmp_arr[i];
