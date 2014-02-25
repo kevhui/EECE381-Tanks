@@ -7,6 +7,7 @@
 
 #include "player.h"
 
+//Initializes player struct
 void initPlayer(int id, int character, char *name, int hp, int gas, int type) {
 	printf("type: %i", type);
 	switch (id) {
@@ -327,129 +328,6 @@ void fireBulletOne(int turn, int power, int wind, int bulletType) {
 	}
 }
 
-/*void fireBulletTwo(int turn, int power, int wind, int bulletType) {
- int splitBullet = 0;
- struct bullet b;
- int i, id;
- int bullet_alive = 1;
- int screenX, screenY;
- int turret_start_x = p[turn].x + TANK_LENGTH / 2 + getTurretWidth(
- p[turn].deg * p[turn].dir);
- int turret_start_y = p[turn].y + TANK_HEIGHT / 2 - getTurretHeight(
- p[turn].deg * p[turn].dir);
- b.x = (turret_start_x) * PIXEL_SCALE;
- b.y = (turret_start_y) * PIXEL_SCALE;
- b.dx = (getTurretWidth(p[turn].deg * p[turn].dir)) * power;
- b.dy = -(getTurretHeight(p[turn].deg * p[turn].dir)) * power;
- //printf("\tstart_x: %i\tx = %i\tdx = %i\tsin(deg)= %i",turret_start_x,b.x,b.dx,sin(p[turn].deg * M_PI) / 180);
- //printf("\tstart_y: %i\ty = %i\tdy = %i",turret_start_y,b.y,b.dy);
-
- do {
- b.dx += wind;
- b.dy -= GRAVITY;
- b.x += b.dx;
- b.y += b.dy;
-
- if (b.dy < 10 && b.dy > -10) {
- splitBullet = 1;
- break;
- }
-
- //clearScreen();
- //updateField();
- for (i = 0; i < numPlayers; ++i) {
- if (p[i].alive)
- updatePlayer(i);
- }
- undrawBullet(b.x / PIXEL_SCALE, b.y / PIXEL_SCALE);
- updateBullet(b.x / PIXEL_SCALE, b.y / PIXEL_SCALE);
- updateScreen();
-
- screenX = b.x / PIXEL_SCALE;
- screenY = b.y / PIXEL_SCALE;
- //printf("field[x]:%i \t bullet y: %i \n",field[screenX],screenY);
- //printf("b.x:%i \t b.y: %i ",b.x,b.y);
- //printf("x:%i \t y: %i ",screenX,screenY);
- //printf("dx:%i dy:%i \n",b.dx,b.dy);
- if (getHitPlayer(screenX, screenY, 2)) {
- bullet_alive = 0;
- bulletExplode(screenX, screenY, 1);
- } else if (getHitGround(screenX, screenY, 2)) {
- bullet_alive = 0;
- bulletExplode(screenX, screenY, 1);
- field[screenX] = field[screenX] + 1;
- printf("hit ground!\n");
- } else if (screenX >= SCREEN_WIDTH - 1 || screenX <= 0 || screenY
- >= SCREEN_HEIGHT - 1) {
- undrawBullet((b.x - b.dx) / PIXEL_SCALE, (b.y - b.dy) / PIXEL_SCALE);
- updateScreen();
- undrawBullet((b.x - b.dx) / PIXEL_SCALE, (b.y - b.dy) / PIXEL_SCALE);
- bullet_alive = 0;
- }
- } while (bullet_alive);
- int saved_x, saved_y, saved_dx, saved_dy;
- int bulletCount;
- if (splitBullet == 1) {
- saved_x = b.x;
- saved_y = b.y;
- saved_dx = b.dx;
- saved_dy = b.dy;
- bulletExplode(b.x,b.y,1);
- for (bulletCount = 0; bulletCount < 8; bulletCount++) {
- b.x = saved_x + rand()%(15*PIXEL_SCALE);
- b.y = saved_y;
- b.dx = rand()%(PIXEL_SCALE/3);
- b.dx = b.dx%2 == 1 ? -b.dx : b.dx;
- b.dy = saved_dy;
- bullet_alive = ALIVE;
- do {
- b.dx += wind;
- b.dy -= GRAVITY;
- b.x += b.dx;
- b.y += b.dy;
-
- if (b.dy < 10 && b.dy > -10) {
- splitBullet = 1;
- break;
- }
-
- //clearScreen();
- //updateField();
- for (i = 0; i < numPlayers; ++i) {
- if (p[i].alive)
- updatePlayer(i);
- }
- undrawBullet(b.x / PIXEL_SCALE, b.y / PIXEL_SCALE);
- updateBullet(b.x / PIXEL_SCALE, b.y / PIXEL_SCALE);
- updateScreen();
-
- screenX = b.x / PIXEL_SCALE;
- screenY = b.y / PIXEL_SCALE;
- //printf("field[x]:%i \t bullet y: %i \n",field[screenX],screenY);
- //printf("b.x:%i \t b.y: %i ",b.x,b.y);
- //printf("x:%i \t y: %i ",screenX,screenY);
- //printf("dx:%i dy:%i \n",b.dx,b.dy);
- bulletExplode(b.x,b.y,1);
- if (getHitPlayer(screenX, screenY, 2)) {
- bullet_alive = 0;
- bulletExplode(screenX, screenY, 2);
- } else if (getHitGround(screenX, screenY, 2)) {
- bullet_alive = 0;
- bulletExplode(screenX, screenY, 2);
- field[screenX] = field[screenX] + 1;
- printf("hit ground!\n");
- } else if (screenX >= SCREEN_WIDTH - 1 || screenX <= 0 || screenY
- >= SCREEN_HEIGHT - 1) {
- undrawBullet((b.x - b.dx) / PIXEL_SCALE, (b.y - b.dy) / PIXEL_SCALE);
- updateScreen();
- undrawBullet((b.x - b.dx) / PIXEL_SCALE, (b.y - b.dy) / PIXEL_SCALE);
- bullet_alive = 0;
- }
- } while (bullet_alive);
- }
- }
-
- }*/
 //Rotates the turret of given player by one unit clock wise
 void turretCW(int id) {
 	if (p[id].deg + 3 <= 120) {
@@ -475,7 +353,6 @@ int getTurretHeight(int degree) {
 }
 
 //See if the bullet hits the player with bullet
-//TODO: decide the hit radius or hit rectangle of bullet
 //It is currently a square bullet
 int getHitPlayer(int x, int y, int hitBoxLength) {
 	int i;
@@ -498,6 +375,7 @@ int getHitPlayer(int x, int y, int hitBoxLength) {
 
 }
 
+//Check to see if the bullet has hit the ground
 int getHitGround(int x, int y, int bulletType) {
 	int i, j;
 	for (j = -1; j <= 1; j++) {
@@ -511,6 +389,7 @@ int getHitGround(int x, int y, int bulletType) {
 	return 0;
 }
 
+//Run the bullet explosion routine
 void bulletExplode(int x, int y, int bulletType) {
 	int r, j, i, colour, offset, id, hit, delay;
 	volatile int c = 2;
@@ -588,15 +467,7 @@ void bulletExplode(int x, int y, int bulletType) {
 	case 2:
 		r = 3;//set the radius of the bullet
 		colour = 0xF7FD;
-		//Remove pixels from the field
-		/*for (i = -r; i <= r; i++) {
-		 offset = sqrt(r * r - i * i);
-		 if (field[x + i] < y + offset) {
-		 //printf("y;%i \t field[x+i]: %i \ty-field[x+i]:%i \t offset:%i\t min: %i",	y,field[x + i],y - field[x + i],offset,(((y - field[x + i]) < offset) ? (y - field[x + i]): offset));
-		 field[x + i] = (y + offset - field[x + i] < 2 * offset) ? y + offset : field[x + i] + 2 * offset;
-		 //printf("\t newfield[x]:%i \n", field[x + i]);
-		 }
-		 }*/
+
 		for (i = -r; i <= r; i++) {
 			offset = sqrt(r * r - i * i);
 			if (x + i >= 0 && x + i < SCREEN_WIDTH) {

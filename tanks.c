@@ -33,12 +33,14 @@ void runGame();
 void setPlayerTurn();
 void updateActions();
 
+//Audio variables
 aud_buf ab_1;
 aud_buf *ab = &ab_1;
 short int file_handle;
 char* fname = "brawl.wav";
 int aOn = 0;
 
+//Game functions
 int windPower = 0;
 struct player p[3];
 int field[SCREEN_WIDTH];
@@ -46,15 +48,17 @@ int map[SCREEN_HEIGHT][SCREEN_WIDTH];
 int turn = pOne;
 int numPlayers;
 float start_time;
+
 //keyboard interrupt variables
 alt_up_ps2_dev *ps2;
 KB_CODE_TYPE decode_mode;
 char ascii;
 alt_u8 buf[4];
 
-//set some of these in player struct!!!//
+
 volatile int state = 0;//state of game
 
+//Flags to indicate movement
 int fLeft = 0;
 int fRight = 0;
 int fDown = 0;
@@ -64,6 +68,7 @@ int fpUp = 0;
 int fpDown = 0;
 int fBullet;
 
+//Displayed when the game is over
 void GameOverScreen() {
 	clearScreen();
 	updateScreen();
@@ -107,6 +112,7 @@ void GameOverScreen() {
 	state = 0;
 }
 
+//Keyboard ISR sets the appropriate flags
 static void keyboard_ISR(void *c, alt_u32 id) { //keyboard interrupt handler
 	if (decode_scancode(ps2, &decode_mode, buf, &ascii) == 0) {
 		printf("Touched %c\n", ascii);
@@ -176,14 +182,7 @@ static void keyboard_ISR(void *c, alt_u32 id) { //keyboard interrupt handler
 				fDown = 0;
 				break;
 			case 21: //bullet switchs
-				//changes power, no function yet
 				fBullet = 0;
-				break;
-			case 0: //page up
-				//changes power, no function yet
-				break;
-			case 1: //page down
-				//changes power, no function yet
 				break;
 			}
 
@@ -224,20 +223,16 @@ void clean_up() {
 	clearCharBuffer();
 	clearScreen();
 	clearPlayerName();
-	//num_of_players = 2;
-	//playersconfig = 1;
-	//playercolor = 0;
-	//playertype = 0;
 }
 
+//initializes keyboard
 void initKeyboard() {
 	ps2 = alt_up_ps2_open_dev(KEYBOARD_NAME);
 	alt_up_ps2_init(ps2);
 	alt_up_ps2_clear_fifo(ps2);
-
-	//IOWR(KEYBOARD_BASE, 1, 0x01); //not sure but jeff put this in his code
 }
 
+//initializes audio buffer
 int initAudio(char* fname) {
 	alt_up_sd_card_dev *device_reference = NULL;
 	device_reference = alt_up_sd_card_open_dev(SD_CARD_NAME);
@@ -258,6 +253,7 @@ int initAudio(char* fname) {
 	return file_handle;
 }
 
+//initializes AI
 void initAI() {
 	int i;
 	for (i = 0; i < numPlayers; i++) {
@@ -288,7 +284,7 @@ int main(void) {
 		initAI();
 
 
-		//This is for Isaac cause he doesnt have a keyboard
+		//Bypass the menu system for testing
 		if (IORD(keys,0) == 8) {
 			initPlayer(pOne, MARIO, "pOne", 50, 100, HUMAN);
 			initPlayer(pTwo, LUIGI, "pTwo", 50, 100, COMPUTER);
@@ -347,6 +343,7 @@ int main(void) {
 		while (state == 2) {
 			int fallFlag = 1;
 
+			//Checks to see if any players are falling
 			while (fallFlag == 1) {
 				fallFlag = 0;
 				for (i = 0; i < numPlayers; i++) {
@@ -360,7 +357,6 @@ int main(void) {
 							undrawPlayer(i);
 							updatePlayer(i);
 							fallFlag = 1;
-							//checkPlayerFalling(i);
 						}
 					}
 				}
@@ -404,30 +400,27 @@ int main(void) {
 	}
 }
 
+//The main game loop
 void runGame(void) {
 	undrawPlayers();
+	
+	//Update player structs
 	updateActions();
 	int i;
 
-	//printf("degree: %d \n",p[turn].deg);
-
-	//clearScreen();
-	//updateField();
-
+	//Draws the player
 	for (i = 0; i < numPlayers; i++) {
 		if(p[i].alive)updatePlayer(i);
 	}
 
+	//Redraw UI
 	drawBullet(p[turn].bulletType);
 	drawGas(p[turn].gas);
 	drawPower(p[turn].power);
 	updateScreen();
-
-	//usleep(1000);
-
-
 }
 
+//Increments to next players turn
 void setPlayerTurn() {
 	alt_timestamp_start();
 	start_time = (float) alt_timestamp() / (float) alt_timestamp_freq();
@@ -440,8 +433,8 @@ void setPlayerTurn() {
 	p[turn].gas = 100;
 }
 
+//Update players structs based on keyboard
 void updateActions() {
-
 	if (IORD(keys,0) == 8) {
 		moveLeft(turn);
 		p[turn].moved = TRUE;
@@ -508,7 +501,6 @@ void updateActions() {
 			fFire = 0;
 			drawHealth(p[pOne].hp, p[pTwo].hp, p[pThree].hp, p[pFour].hp);
 			drawBullet(p[turn].bulletType);
-			//drawWindIndicator(1);
 			updateScreen();
 			drawHealth(p[pOne].hp, p[pTwo].hp, p[pThree].hp, p[pFour].hp);
 		}
